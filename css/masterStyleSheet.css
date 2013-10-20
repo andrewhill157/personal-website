@@ -1,0 +1,104 @@
+/*Stylings applicable to all pages as the master*/
+body {
+    background-image: url('../images/background-pattern.png');
+}
+
+/*Styling for the page header and navigation bar*/
+#pageHeading {
+    text-align: center;
+}
+
+header {
+	background: white;
+	margin: 0;
+}
+
+#pageHeading {
+	margin: 0;
+    
+    text-align: center;
+}
+
+#navigationBar {
+	padding: 10px;
+	background: white;
+	text-align: center;
+	margin: 0;
+	border-top: 1px solid #e1e1e1;
+	border-bottom: 1px solid #e1e1e1;
+}
+
+#navigationBar li {
+	display: inline;
+	padding: 10px 10px 10px 10px;
+	color: #39275B;
+    margin: 0;
+}
+
+#navigationBar li:hover {
+    background-color: rgba(251, 251, 251, 1);
+    border-bottom: 4px  solid rgba(57, 39, 91, 1);
+}
+
+/*Container for all page content below header*/
+#invisibleContainer {
+    width: 780px;
+    margin: 0 auto;
+}
+
+/*Container for main column of content*/
+#container {
+    background: white;
+    border-left: 2px solid #e1e1e1;
+    border-right: 2px solid #e1e1e1;
+    width: 700px;
+    margin: 0 auto 30px auto;
+    overflow: hidden;
+}
+
+/*Formatting for article enties*/
+.article {
+    padding: 30px;
+    text-align: justify;
+    border-bottom: 2px solid #E3BF42;
+}
+
+.articleTitle {
+    margin: 0;
+}
+
+.articleDate {
+    margin: 0;
+}
+
+.articleText {
+    margin: 10px, 0, 0, 0;
+}
+
+/*Formatting for social media links*/
+#socialMediaLinks img {
+    height:35px;
+    display: block;
+    background: #39275B;
+    margin-bottom: 4px;
+
+}
+
+#socialMediaLinks {
+    height: auto;
+    margin: 20px auto 0 auto;
+    float: right;
+}
+
+#socialMediaLinks img:hover {
+    transform:scale(1.2);
+    -moz-transform:scale(1.2); 
+    -webkit-transform:scale(1.2);
+    -o-transform:scale(1.2);
+}
+
+/*Copyright text formatting*/
+#copyright {
+    text-align: center;
+    margin-bottom: 30px;
+}

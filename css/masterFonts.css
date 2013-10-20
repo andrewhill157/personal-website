@@ -1,0 +1,28 @@
+/*Font size, color, family, etc. stylings*/
+body, header{
+	font-family: 'Open Sans', sans-serif;
+}
+
+#pageHeading {
+	font-family: 'Open Sans', sans-serif;
+	font-size: 60px;
+    color: #39275B;
+}
+
+#pageHeading a:hover, a:visited, a:link, a:active a{
+    text-decoration: none;
+}
+
+.articleTitle {
+    color: #39275B;
+}
+
+.articleDate {
+    font-style: italic;
+    color: gray;
+}
+
+#copyright {
+    font-size: 14px;
+    color:gray;
+}
