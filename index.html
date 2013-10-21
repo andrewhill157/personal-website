@@ -6,61 +6,84 @@
     
     <!--Google Web Fonts for pages-->
     <link href='http://fonts.googleapis.com/css?family=Ubuntu|Open+Sans' rel='stylesheet' type='text/css'>
-    
-    <!--Tooltipster Plugin-->
-    <link rel="stylesheet" type="text/css" href="css/tooltipster.css"/>
-
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.0.min.js"></script>
-    <script type="text/javascript" src="js/jquery.tooltipster.min.js"></script>
-    
-    <!--Activate Tooltipster on startup-->
-    <script>
-    $(document).ready(function() {
-        $('.tooltip').tooltipster({
-            position: 'left'
-        });
-    });
-    </script>
-    
+ 
     <!--Custom CSS files for page-->
     <link href='css/masterStyleSheet.css' rel='stylesheet'>
     <link href='css/masterFonts.css' rel='stylesheet'>
     <link href='css/coverPhoto.css' rel='stylesheet'>
+    
+    <!--Tooltipster Plugin Styling-->
+    <link rel="stylesheet" type="text/css" href="css/tooltipster.css"/>
+
      
     <!--Title of page-->
 	<title>Andrew John Hill</title>
 </head>
 
 <body>
-    <!--Header and links to other pages on the site-->
-	<header>
-		<h1 id="pageHeading">Andrew John Hill</h1>
-		<ul id="navigationBar">
-            <li><a href='index.html'>Home</a></li>
-			<li><a href='about-me.html'>About Me</a></li>
-			<li><a href='research.html'>Research</a></li>
-		</ul>
-	</header>
-
-    <!--Outer div to house social media links and page content-->
-    <div id="invisibleContainer">   
-        <!--Social Media Links-->
-        <div id="socialMediaLinks">
-            <a href="https://github.com/andrewhill157" target="_blank" align="left"><img src="images/socialMedia/github-1024.png" class="tooltip" title="GitHub: Software Repository"></a>
-            <a href="http://www.linkedin.com/profile/view?id=55993017" target="_blank" align="left"><img src="images/socialMedia/linkedin-1024.png" class="tooltip" title="LinkedIn: Professional Profile"></a>
-            <a href="http://www.youtube.com/user/andrewhill157BRL/videos" target="_blank" align="left"><img src="images/socialMedia/youtube-1024.png" class="tooltip" title="YouTube: Project Videos"></a>        
-            <a href="https://twitter.com/_AndrewJohnHill" target="_blank" align="left"><img src="images/socialMedia/twitter-1024.png" class="tooltip" title="Twitter: Science Commentary"></a>
-            <a href="https://www.facebook.com/profile.php?id=729692151&sk=about" target="_blank" align="left"><img src="images/socialMedia/facebook-1024.png" class="tooltip" title="Facebook: Personal Profile"></a>
+<!--Outer div to house social media links and page content-->
+<div id="invisibleContainer">   
     
-        <!--Container to hold various entries-->
-        </div>
-        <div id="container">
-            <div class="coverPhoto">
-                <img class="coverPhoto" src="images/header.jpg"/>
-            </div>
-        </div>
+    <!--Header and links to other pages on the site-->
+	<div id="header">
+        <span id="myName">Andrew Hill</span>
+        <span id="navigationLinks">
+            <ul>
+                <li id="BioButton">Bio</li>
+                <li id="ResearchButton">Research</li>
+                <li id="ProjectsButton">Projects</li>
+                <li id="CVButton">CV</li>
+            </ul>
+        </span>
+	</div>
+
+    <div class="section">
+        <h2 class=".sectionTitle" id="Bio">Bio</h2>
+        <p class=".sectionText">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur molestie odio at volutpat scelerisque. Duis condimentum congue ligula, in venenatis urna suscipit et. Integer interdum volutpat libero. Morbi massa nunc, fermentum vel tellus at, aliquet congue leo. Vestibulum volutpat tempor arcu. Integer et egestas diam, eu tempor libero. Aliquam fermentum condimentum risus, eget semper sem vehicula vitae. Quisque placerat neque nunc. Praesent lobortis sem sed ante rutrum eleifend. Phasellus aliquet, sapien sit amet elementum vestibulum, ante tellus malesuada dui, at tempor ante enim vel lacus. Donec quis porttitor leo. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>
+        
+                <!--Social Media Links-->
+    <div id="socialMediaLinks">
+        <a href="https://github.com/andrewhill157" target="_blank" align="left"><img src="images/socialMedia/github-1024.png" class="tooltip" title="GitHub: Software Repository"></a>
+        <a href="http://www.linkedin.com/profile/view?id=55993017" target="_blank" align="left"><img src="images/socialMedia/linkedin-1024.png" class="tooltip" title="LinkedIn: Professional Profile"></a>
+        <a href="http://www.youtube.com/user/andrewhill157BRL/videos" target="_blank" align="left"><img src="images/socialMedia/youtube-1024.png" class="tooltip" title="YouTube: Project Videos"></a>        
+        <a href="https://twitter.com/_AndrewJohnHill" target="_blank" align="left"><img src="images/socialMedia/twitter-1024.png" class="tooltip" title="Twitter: Science Commentary"></a>
+        <a href="https://www.facebook.com/profile.php?id=729692151&sk=about" target="_blank" align="left"><img src="images/socialMedia/facebook-1024.png" class="tooltip" title="Facebook: Personal Profile"></a>
+    </div>
     </div>
     
+    <div class="section" id="Research">
+        <h2 class=".sectionTitle">Research</h2>
+        <p class=".sectionText">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur molestie odio at volutpat scelerisque. Duis condimentum congue ligula, in venenatis urna suscipit et. Integer interdum volutpat libero. Morbi massa nunc, fermentum vel tellus at, aliquet congue leo. Vestibulum volutpat tempor arcu. Integer et egestas diam, eu tempor libero. Aliquam fermentum condimentum risus, eget semper sem vehicula vitae. Quisque placerat neque nunc. Praesent lobortis sem sed ante rutrum eleifend. Phasellus aliquet, sapien sit amet elementum vestibulum, ante tellus malesuada dui, at tempor ante enim vel lacus. Donec quis porttitor leo. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>
+    </div>
+    
+    <div class="section" id="Projects">
+        <h2 class=".sectionTitle">Projects</h2>
+        <p class=".sectionText">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur molestie odio at volutpat scelerisque. Duis condimentum congue ligula, in venenatis urna suscipit et. Integer interdum volutpat libero. Morbi massa nunc, fermentum vel tellus at, aliquet congue leo. Vestibulum volutpat tempor arcu. Integer et egestas diam, eu tempor libero. Aliquam fermentum condimentum risus, eget semper sem vehicula vitae. Quisque placerat neque nunc. Praesent lobortis sem sed ante rutrum eleifend. Phasellus aliquet, sapien sit amet elementum vestibulum, ante tellus malesuada dui, at tempor ante enim vel lacus. Donec quis porttitor leo. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>
+    </div> 
+
+    <div class="section" id="CV">
+        <h2 class=".sectionTitle">CV</h2>
+        
+        <!--Links to CV and resume-->
+        <a id="downloadLink" target="_blank" href="documents/resume.pdf">Download CV (PDF)</a>
+        <a id="downloadLink" target="_blank" href="documents/resume.pdf">Download Resume (PDF)</a>
+        
+        <p class=".sectionText">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur molestie odio at volutpat scelerisque. Duis condimentum congue ligula, in venenatis urna suscipit et. Integer interdum volutpat libero. Morbi massa nunc, fermentum vel tellus at, aliquet congue leo. Vestibulum volutpat tempor arcu. Integer et egestas diam, eu tempor libero. Aliquam fermentum condimentum risus, eget semper sem vehicula vitae. Quisque placerat neque nunc. Praesent lobortis sem sed ante rutrum eleifend. Phasellus aliquet, sapien sit amet elementum vestibulum, ante tellus malesuada dui, at tempor ante enim vel lacus. Donec quis porttitor leo. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>
+    </div> 
+    </div>
+
+    
     <div id="copyright">Copyright 2013 Andrew John Hill</div>
+    
+    <!--JQuery-->
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.0.min.js"></script>
+    
+    <!--JavaScript-->
+    <!--Callback functions for the navigation bar-->
+    <script type="text/javascript" src="js/menuButtonCallbacks.js"></script>
+    
+    <!--Tooltipster Plugin-->
+    <script type="text/javascript" src="js/jquery.tooltipster.min.js"></script>
+    <script type="text/javascript" src="js/activateToolTipster.js"></script>
 </body>
 </html>

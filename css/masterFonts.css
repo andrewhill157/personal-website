@@ -1,25 +1,26 @@
 /*Font size, color, family, etc. stylings*/
-body, header{
+body, #header{
 	font-family: 'Open Sans', sans-serif;
 }
 
-#pageHeading {
+#myName {
 	font-family: 'Open Sans', sans-serif;
-	font-size: 60px;
+	font-size: 40px;
     color: #39275B;
+    font-weight: bolder;
 }
 
-#pageHeading a:hover, a:visited, a:link, a:active a{
+#navigationLinks a:hover, a:visited, a:link, a:active a{
     text-decoration: none;
 }
 
-.articleTitle {
+.sectionTitle {
     color: #39275B;
 }
 
-.articleDate {
-    font-style: italic;
-    color: gray;
+#downloadLink {
+    color: white;
+    
 }
 
 #copyright {
