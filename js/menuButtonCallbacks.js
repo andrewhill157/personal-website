@@ -8,11 +8,11 @@
 function getScrollTime(id, scrollVelocity) 
 {    
     // Distance from current top of screen to the target id on page
-    var distanceToTarget = $(id).offset().top - $(window).scrollTop();
+    // Absolute value to obtain the positive distance (prevents return of negative times).
+    var distanceToTarget = Math.abs($(id).offset().top - $(window).scrollTop());
     
     // Calculate time to reach target id given velocity
-    scrolltime = distanceToTarget/scrollVelocity;
-    return scrolltime;
+    return distanceToTarget/scrollVelocity;
 }
 
 /* Animates scrolling from the top of the current viewable screen to the target id in the
