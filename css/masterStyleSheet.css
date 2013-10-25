@@ -45,6 +45,7 @@ span {
 	padding: 14px 10px 14px 10px;
 	color: #39275B;
     margin: 0;
+    cursor: pointer;
 }
 
 #navigationLinks li:hover {
