@@ -4,7 +4,7 @@ body {
 }
 
 /*Container for all page content*/
-#invisibleContainer {
+.invisibleContainer {
     background: white;
     border-left: 2px solid #e1e1e1;
     border-right: 2px solid #e1e1e1;
@@ -12,6 +12,8 @@ body {
     max-width: 880px;
     margin: 0px auto;
     margin-bottom: 20px;
+
+    margin-top: 55px;
 }
 
 /*Name and navigation links*/
@@ -22,22 +24,32 @@ span {
 
 #header {
 	background: white;
+    position: fixed;
+    top: 0;
     width: 100%;
-    margin: 0 auto;
 	background: white;
 	border-top: 1px solid #e1e1e1;
 	border-bottom: 1px solid #e1e1e1;
+    text-align: center;
+    
+    
+}
+
+#headerWrapper {
+    max-width: 880px;
     text-align: right;
+    margin: 0 auto;
 }
 
 #myName {
-	margin-left: 40px;
     float: left;
+    margin-left: 10px;
 }
 
 #navigationLinks {
-    margin-right: 40px;
+
     margin-left: 0;
+    margin-right: 10px;
 }
 
 #navigationLinks li {

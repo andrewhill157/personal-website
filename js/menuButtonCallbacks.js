@@ -23,7 +23,7 @@ function getScrollTime(id, scrollVelocity)
 function scrollToID(id, scrolltime) 
 {
     $('html, body').animate({
-    scrollTop: $(id).offset().top}, scrolltime);    
+    scrollTop: $(id).offset().top - 55}, scrolltime);    
 }
 
 // Smooth scrolling functionality for each navigation buttons
