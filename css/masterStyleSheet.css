@@ -12,8 +12,8 @@ body {
     max-width: 880px;
     margin: 0px auto;
     margin-bottom: 20px;
-
     margin-top: 55px;
+    
 }
 
 /*Name and navigation links*/
@@ -31,7 +31,7 @@ span {
 	border-top: 1px solid #e1e1e1;
 	border-bottom: 1px solid #e1e1e1;
     text-align: center;
-    
+    z-index: 10;
     
 }
 
@@ -67,16 +67,16 @@ span {
 
 /*Different name and header format for smaller screens*/
 @media (max-width: 700px) {
-    #header {
-        text-align: center;
-    }
-    
     #myName {
         float: none;
     }
     
     #navigationLinks {
-        margin: 0 auto;   
+        margin: 0 auto;
+    }
+    
+    #headerWrapper {
+        text-align: center;
     }
 }
 
@@ -113,6 +113,24 @@ span {
     -moz-transform:scale(1.1); 
     -webkit-transform:scale(1.1);
     -o-transform:scale(1.1);
+}
+
+.embed-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.embed-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16/9 ratio */
+    
+    /* IE6 workaround*/
+    padding-top: 30px; 
+    height: 0;
+    overflow: hidden;
 }
 
 #downloadLink {
