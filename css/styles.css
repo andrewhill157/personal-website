@@ -105,7 +105,14 @@ span {
     text-align: justify;   
 }
 
-.sectionText {margin: 0;}
+.sectionText {
+    margin: 0; 
+    margin-bottom: 15px;
+}
+
+.sectionLink:hover {
+    text-decoration: underline;
+}
 
 .project {
     margin-bottom: 20px;
@@ -125,11 +132,12 @@ span {
     color: #39275B; 
     
     margin-bottom: 5px;
+    margin-top: 15px;
 } 
 
-#Projects .sectionTitle {cursor: pointer;}
+#Research .sectionTitle {cursor: pointer;}
 
-#Projects .sectionTitle:hover {color: #E3BF42;}
+#Research .sectionTitle:hover {color: #E3BF42;}
 
 .insitutionTitle {
     margin-bottom: 5px;

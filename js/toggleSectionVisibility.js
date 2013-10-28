@@ -8,19 +8,21 @@ function toggleHeight(elements) {
     var openElements = elements.filter(function() {return $(this).is(":visible");}).length;
     
     // Toggle/hide/show elements based on relative number of open elements
+    var time = 275;
+    
     if (openElements == 0 || openElements == elements.length) 
-        elements.animate({height: "toggle"}, 300, function() { });  
+        elements.animate({height: "toggle"}, time, function() { });  
     else if(openElements < elements.length/2)
-        elements.animate({height: "hide"}, 300, function() { });
+        elements.animate({height: "hide"}, time, function() { });
     else
-        elements.animate({height: "show"}, 300, function() { });
+        elements.animate({height: "show"}, time, function() { });
 }
 
 // Allow hiding and showing of projects to prevent clutter as number of projects grows 
 $(document).ready(function() {    
     // Toggle visibility of all projects by clicking the project section title
     $(".sectionTitle").click(function() {
-        var projects = $(this).closest("#Projects").find(".insitution").find(".projectBody");
+        var projects = $(this).closest("#Research").find(".insitution").find(".projectBody");
         toggleHeight(projects);
     });    
     

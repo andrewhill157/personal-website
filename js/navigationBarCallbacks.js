@@ -37,14 +37,14 @@ $(document).ready(function() {
     });
     
     
-    $("#ResearchButton").on('click', function() {
-        var id = "#Research";
+    $("#InterestsButton").on('click', function() {
+        var id = "#Interests";
         var scrolltime = getScrollTime(id, scrollVelocity);
         scrollToID(id, scrolltime);
     });
     
-    $("#ProjectsButton").on('click', function() {
-        var id = "#Projects";
+    $("#ResearchButton").on('click', function() {
+        var id = "#Research";
         var scrolltime = getScrollTime(id, scrollVelocity);
         scrollToID(id, scrolltime);
     });
