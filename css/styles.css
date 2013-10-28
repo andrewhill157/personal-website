@@ -96,8 +96,20 @@ span {
     #headerWrapper {text-align: center;}
 }
 
+/*Formatting for photo*/
+#headshot img {
+    float: left;
+    
+    width: 35%;
+    
+    margin-right: 20px;
+    
+    border: 2px solid #e1e1e1;
+}
+
 /*Formatting for sections*/
 .section {
+    clear: both;
     padding: 20px 40px 20px 40px;
     
     border-bottom: 1px solid #E3BF42;
