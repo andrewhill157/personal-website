@@ -121,9 +121,11 @@ span {
 }
 
 /*Formatting for section titles*/
-.title {color: #39275B;} 
-
-.sectionTitle {margin: 0;}
+.title {
+    color: #39275B; 
+    
+    margin-bottom: 5px;
+} 
 
 #Projects .sectionTitle {cursor: pointer;}
 
@@ -131,7 +133,7 @@ span {
 
 .insitutionTitle {
     margin-bottom: 5px;
-    
+
     cursor: pointer;
 }
 
