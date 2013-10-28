@@ -28,11 +28,11 @@ function scrollToID(id, scrolltime)
 
 // Smooth scrolling functionality for each navigation buttons
 $(document).ready(function() { 
-    var scrollVelocity = 1;
+    var scrollVelocity = 2;
     
     $("#BioButton").on('click', function() {
         var id = "#Bio";
-        var scrolltime = getScrollTime(id, 1);
+        var scrolltime = getScrollTime(id, scrollVelocity);
         scrollToID(id, scrolltime);
     });
     

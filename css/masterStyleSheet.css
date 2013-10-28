@@ -87,18 +87,43 @@ span {
     border-bottom: 1px solid #E3BF42;
 }
 
+.title {
+    color: #39275B;
+}
+
 .sectionTitle {
     margin: 0;
 }
 
+.insitutionTitle {
+    margin-bottom: 5px;
+}
+
+.projectTitle {
+    margin-bottom: 5px;
+}
+
 .sectionText {
-    margin: 10px, 0, 0, 0;
+    margin: 0;
+  
+}
+
+.project {
+    margin-bottom: 20px;
+    padding-left: 20px;
+    border-left: 2px solid #e1e1e1;
+}
+
+.project:hover {
+    border-left: 3px solid #e1e1e1;
+    padding-left: 19px;
 }
 
 /*Formatting for social media links*/
 #socialMediaLinks {
     height: auto;
     text-align: center;
+    margin-top: 10px;
 }
 
 #socialMediaLinks img {
@@ -133,12 +158,24 @@ span {
     overflow: hidden;
 }
 
-#downloadLink {
+.downloadLink {
     text-decoration: none;
+    color: white;
     background-color: #39275B;
-    padding: 10px;
-    margin-right: 10px;
+    margin-top: 20px;
+    margin-bottom: 10px;
 }
+
+.downloadLink:hover {
+    -moz-transform:scale(1.02); 
+    -webkit-transform:scale(1.02);
+    -o-transform:scale(1.02);
+}
+
+.downloadLink a {
+    padding: 10px;
+}
+
 
 /*Copyright text formatting*/
 #copyright {
