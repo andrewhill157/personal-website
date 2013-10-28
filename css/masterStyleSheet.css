@@ -95,12 +95,18 @@ span {
     margin: 0;
 }
 
+#Projects .sectionTitle {
+    cursor: pointer;
+}
+
 .insitutionTitle {
     margin-bottom: 5px;
+    cursor: pointer;
 }
 
 .projectTitle {
     margin-bottom: 5px;
+    cursor: pointer;
 }
 
 .sectionText {
