@@ -1,20 +1,38 @@
+// Toggles, shows, or hides elements on the page.  
+// @params elements: the JQuery selected elements to be altered
+// If all elements are visible or hidden, the visibility is toggled
+// If some elements are shown but less than half of all elements are shown, visibility is set to hide
+// If some elements are shown but more than half of all elements are shown, visibility is set to show
+function toggleHeight(elements) {
+    // Get the number of the elements that are visible on the page
+    var openElements = elements.filter(function() {return $(this).is(":visible");}).length;
+    
+    // Toggle/hide/show elements based on relative number of open elements
+    if (openElements == 0 || openElements == elements.length) 
+        elements.animate({height: "toggle"}, 300, function() { });  
+    else if(openElements < elements.length/2)
+        elements.animate({height: "hide"}, 300, function() { });
+    else
+        elements.animate({height: "show"}, 300, function() { });
+}
+
 // Allow hiding and showing of projects to prevent clutter as number of projects grows 
 $(document).ready(function() {    
     // Toggle visibility of all projects by clicking the project section title
     $(".sectionTitle").click(function() {
-        $(this).closest("#Projects").find(".insitution").find(".projectBody").animate({
-            height: "toggle"}, 300, function() { });
+        var projects = $(this).closest("#Projects").find(".insitution").find(".projectBody");
+        toggleHeight(projects);
     });    
     
     // Toggle visibility of all projects at a given institution by clicking institution title
-    $(".projectTitle" ).click(function() {
-        $(this).next(".projectBody").animate({
-            height: "toggle"}, 300, function() { });
+    $( ".insitutionTitle").click(function() {
+        var projects = $(this).closest(".insitution").find(".projectBody");
+        toggleHeight(projects); 
     });
     
-    // Toggle visibility of individual projects by clicking on the project title
-    $( ".insitutionTitle").click(function() {
-        $(this).closest(".insitution").find(".projectBody").animate({
-            height: "toggle"}, 300, function() { });
+    // Toggle visibility of individual projects by clicking on the project title    
+    $(".projectTitle" ).click(function() {
+        var projects = $(this).next(".projectBody");
+        toggleHeight(projects);
     });
 });
