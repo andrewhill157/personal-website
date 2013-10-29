@@ -5,6 +5,11 @@ body {
     font-family: 'Open Sans', sans-serif;
 }
 
+a {
+  color:inherit;
+  text-decoration: none;
+}
+
 /*Container for all page content*/
 .invisibleContainer {
     background: white;
@@ -66,6 +71,10 @@ span {
     margin-right: 10px;
 }
 
+#navigationLinks ul {
+    padding: 0;   
+}
+
 #navigationLinks li {
 	display: inline;
     
@@ -83,41 +92,62 @@ span {
     border-bottom: 4px  solid rgba(57, 39, 91, 1);
 }
 
-#navigationLinks a:hover, a:visited, a:link, a:active a{
-    text-decoration: none;
-}
-
 /*Different name and header format for smaller screens*/
-@media (max-width: 570px) {
+@media only screen and (max-device-width: 480px) {
     #myName {
-        
-        float: none;
         font-size: 25px;
-        margin: 0 auto;
-        
+        position: relative;
+        top: 2px;
     }
     
     #navigationLinks ul {
         margin-top: 10px;
         padding: 0;
+        margin: 0;
+        position: relative;
+        top: 8px;
     }
 
-    #navigationLinks {
-        
+    #navigationLinks li {
+        padding: 7px 5px 7px 5px;
     }
+    
     #headerWrapper {
-        text-align: center;
         margin: 0;
-        
+        height: 40px;
     }
     
     #headerWrapper span {
         display: block;
         padding: 0;
-        margin: 0;
+        margin-right: 2px;
+        margin-left: 2px; 
     }
     
+    .invisibleContainer {
+        margin-top: 42px;   
+    }
+}
+
+/*Different name and header format for even smaller screens*/
+@media (max-width: 425px) {
+    #myName {
+        float: none;
+        margin: 0 auto;
+    }
+
+    #navigationLinks li {
+        padding: 7px 5px 4px 5px;
+    }
     
+    #headerWrapper {
+        text-align: center;
+        height: 70px;
+    }
+    
+    .invisibleContainer {
+        margin-top: 68px;   
+    }
 }
 
 /*Formatting for photo*/
@@ -167,6 +197,8 @@ span {
     
     margin-bottom: 5px;
     margin-top: 15px;
+    
+    text-align: left;
 } 
 
 #Research .sectionTitle {cursor: pointer;}
@@ -257,11 +289,12 @@ span {
 /*Formatting for download links*/
 .downloadLink {
     text-decoration: none;
+    
     color: white;
     
     background-color: #39275B;
     
-    margin-top: 20px;
+    margin-top: 10px;
     margin-bottom: 10px;
 }
 
@@ -273,6 +306,7 @@ span {
 }
 
 .downloadLink a {
+    font-size: 15px;
     padding: 10px;
 }
 
