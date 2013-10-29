@@ -88,12 +88,36 @@ span {
 }
 
 /*Different name and header format for smaller screens*/
-@media (max-width: 700px) {
-    #myName {float: none;}
+@media (max-width: 570px) {
+    #myName {
+        
+        float: none;
+        font-size: 25px;
+        margin: 0 auto;
+        
+    }
     
-    #navigationLinks {margin: 0 auto;}
+    #navigationLinks ul {
+        margin-top: 10px;
+        padding: 0;
+    }
+
+    #navigationLinks {
+        
+    }
+    #headerWrapper {
+        text-align: center;
+        margin: 0;
+        
+    }
     
-    #headerWrapper {text-align: center;}
+    #headerWrapper span {
+        display: block;
+        padding: 0;
+        margin: 0;
+    }
+    
+    
 }
 
 /*Formatting for photo*/
