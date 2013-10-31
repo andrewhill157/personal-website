@@ -1,9 +1,0 @@
-/*Formatting specific to cover photo on main page*/
-.coverPhotoContainer {
-    border-bottom: 2px solid #E3BF42;
-    overflow: hidden;
-}
-
-.coverPhoto {
-    margin-bottom: -5px
-}

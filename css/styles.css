@@ -92,74 +92,6 @@ span {
     border-bottom: 4px  solid rgba(57, 39, 91, 1);
 }
 
-/*Different name and header format for smaller screens*/
-@media only screen and (max-device-width: 500px) {
-    #myName {
-        font-size: 25px;
-        position: relative;
-        top: 2px;
-    }
-    
-    #navigationLinks ul {
-        margin-top: 10px;
-        padding: 0;
-        margin: 0;
-        position: relative;
-        top: 8px;
-    }
-    
-    .project {
-        padding: 0;   
-        margin: 0;
-        background-color: red;
-    }
-    
-    #navigationLinks li {
-        padding: 7px 5px 7px 5px;
-    }
-    
-    .projectText, .leadText, .title{
-        text-align: left;
-    }
-    
-    #headerWrapper {
-        margin: 0;
-        height: 40px;
-    }
-    
-    #headerWrapper span {
-        display: block;
-        padding: 0;
-        margin-right: 2px;
-        margin-left: 2px; 
-    }
-    
-    .invisibleContainer {
-        margin-top: 42px; 
-    }
-}
-
-/*Different name and header format for even smaller screens*/
-@media (max-width: 425px) {
-    #myName {
-        float: none;
-        margin: 0 auto;
-    }
-
-    #navigationLinks li {
-        padding: 7px 5px 4px 5px;
-    }
-    
-    #headerWrapper {
-        text-align: center;
-        height: 70px;
-    }
-    
-    .invisibleContainer {
-        margin-top: 68px;   
-    }
-}
-
 /*Formatting for photo*/
 #headshot img {
     float: left;
@@ -177,7 +109,7 @@ span {
 /*Formatting for sections*/
 .section {
     overflow: hidden;
-    padding: 20px 20px 20px 20px;
+    padding: 20px 4% 20px 4%;
     
     border-bottom: 1px solid #C79900;
     
@@ -195,6 +127,11 @@ span {
 
 .sectionLink:hover {
     text-decoration: underline;
+}
+
+.smallIcon {
+    height: 25px;
+    margin-right: 5px;
 }
 
 .interestTitle {
@@ -292,7 +229,7 @@ span {
 #socialMediaLinks img {
     background: #39275B;
     
-    height:30px;
+    height:40px;
     
     display: inline;
     
@@ -354,8 +291,6 @@ span {
     font-weight: 400;
 }
 
-
-
 /*Copyright text formatting*/
 #copyright {
     text-align: center;
@@ -363,4 +298,66 @@ span {
     color: gray; 
     
     margin-bottom: 30px;
+}
+
+/*Different name and header format for smaller screens*/
+@media only screen and (max-device-width: 500px) {
+    #myName {
+        font-size: 25px;
+        position: relative;
+        top: 2px;
+    }
+    
+    #navigationLinks ul {
+        margin-top: 10px;
+        padding: 0;
+        margin: 0;
+        position: relative;
+        top: 8px;
+    }
+    
+    #navigationLinks li {
+        padding: 7px 5px 7px 5px;
+    }
+    
+    .projectText, .leadText, .title{
+        text-align: left;
+    }
+    
+    #headerWrapper {
+        margin: 0;
+        height: 40px;
+    }
+    
+    #headerWrapper span {
+        display: block;
+        padding: 0;
+        margin-right: 2px;
+        margin-left: 2px; 
+    }
+    
+    .invisibleContainer {
+        margin-top: 42px; 
+    }
+}
+
+/*Different name and header format for even smaller screens*/
+@media (max-width: 425px) {
+    #myName {
+        float: none;
+        margin: 0 auto;
+    }
+
+    #navigationLinks li {
+        padding: 7px 5px 4px 5px;
+    }
+    
+    #headerWrapper {
+        text-align: center;
+        height: 70px;
+    }
+    
+    .invisibleContainer {
+        margin-top: 68px;   
+    }
 }
