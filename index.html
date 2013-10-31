@@ -1,22 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional website of Andrew Hill. View my professional interests, CV, Resume, and selected research projects.">
+    <meta name="author" content="Andrew John Hill">
+    <link rel="shortcut icon" href="images/favicon.ico">
+       
+    <title>Andrew John Hill</title>
+    
+      <style>[touch-action="none"]{ -ms-touch-action: none; touch-action: none; }[touch-action="pan-x"]{ -ms-touch-action: pan-x; touch-action: pan-x; }[touch-action="pan-y"]{ -ms-touch-action: pan-y; touch-action: pan-y; }[touch-action="scroll"],[touch-action="pan-x pan-y"],[touch-action="pan-y pan-x"]{ -ms-touch-action: pan-x pan-y; touch-action: pan-x pan-y; }</style>
+    
     <!--Style sheet suggested for browser consistency-->
 	<link href='css/normalize.css' rel='stylesheet'>
     
     <!--Google Web Fonts for pages-->
-    <link href='http://fonts.googleapis.com/css?family=Ubuntu|Open+Sans' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,800,700,600' rel='stylesheet' type='text/css'>
  
     <!--Custom CSS for page-->
     <link href='css/styles.css' rel='stylesheet'>
+    <link href='css/grid-layout.css' rel='stylesheet'>
     
     <!--Tooltipster Plugin Styling-->
     <link rel="stylesheet" type="text/css" href="css/tooltipster.css"/>
 
-    <!--Title of page-->
-	<title>Andrew John Hill</title>
-    <link rel="shortcut icon" href="images/favicon.ico">
-    <meta name="description" content="Professional website of Andrew Hill. View my professional interests, CV, Resume, and selected research projects.">
+
 </head>
 
 <body>
@@ -24,7 +31,7 @@
 <!--Header and links to other sections-->
 <nav id="header">
     <div id="headerWrapper">
-    <span id="myName"><a href="http://www.andrewjohnhill.com">Andrew Hill</a></span>
+    <span id="myName">Andrew Hill</span>
     <span id="navigationLinks">
         <ul>
             <li id="BioButton">Bio</li>
@@ -42,8 +49,7 @@
     <div class="section" id="Bio">
         <h2 class="title  sectionTitle">Bio</h2>
         <div id="headshot"><img src="images/headshot.jpg"></div>
-        <p class="sectionText">I am currently applying to graduate school as the next step in my pursuit of becoming a leader in biomedical research. In 2012, I graduated with a BS in Bioengineering with College Honors from the University of Washington, Seattle. Since graduating I have been working both in industry and academia to advance my technical skills in engineering, software development, and science.</p>
-        <p class="sectionText">I would be especially interested in hearing from professors or graduate students about opportunities to join or rotate in their laboratories. My CV, research interests, and selected past projects are included below for reference.</p>
+        <p class="leadText">I am currently applying to graduate school as the next step in my pursuit of becoming a leader in biomedical research. In 2012, I graduated with a BS in Bioengineering with College Honors from the University of Washington, Seattle. Since graduating I have been working both in industry and academia to advance my technical skills in engineering, software development, and science.</p>
         
     <!--Social Media Links-->
         <div id="socialMediaLinks">
@@ -61,42 +67,69 @@
         <h2 class="title  sectionTitle">CV</h2>
         
         <!--Links to CV and resume-->
-                <p class="sectionText">I maintain up-to-date copies of my CV and resume on this site. Please download PDFs of these documents using the links provided below.</p>
-        <span class="downloadLink"><a class="downloadLink" target="_blank" href="documents/resume.pdf">Download CV (PDF)</a></span>
-        <span class="downloadLink"><a class="downloadLink" target="_blank" href="documents/resume.pdf">Download Resume (PDF)</a></span>
+                <p class="leadText">I maintain up-to-date copies of my CV and resume on this site. Please download PDFs of these documents using the links provided below.</p>
+        <span class="downloadLink"><a class="downloadLink" target="_blank" href="documents/Hill_A CV.pdf">Download CV (PDF)</a></span>
+        <span class="downloadLink"><a class="downloadLink" target="_blank" href="documents/Hill_A CV.pdf">Download Resume (PDF)</a></span>
     </div>     
     
     <div class="section" id="Interests">
         <h2 class="title  sectionTitle">Interests</h2>
-        <p class="sectionText">Broadly, I am interested in the application of computation to biomedical research problems. I seek to advance our understanding of and ability to treat human disease. Additionally, I am interested in the well-planned application of technology to enhance the quality of healthcare.</p>
-            
-        <p class="sectionText">More specifically, I am currently interested in fields of computational biology and genomics. Within this field I am excited about research that strives to integrate genomic data, such as variants identified by GWAS, with other data sources, such as epigenetic data, tissue expression data, and protein interaction networks to elucidate genomic regulation and identify new targetable pathways implicated in human disease. I am also interested in integration of multiple data sources to advance clinical decision making and move towards the goal of personalized medicine.</p>
+        <p class="leadText">Broadly, I am interested in the application of computation to biomedical research problems. I seek to advance our understanding of and ability to treat human disease. Additionally, I am interested in the well-planned application of technology to enhance the quality of healthcare.</p>
+        
+<div class="title partition group">
+	<div class="col span_1_of_3">
+    <h2 class="interestTitle">Big Data</h2>
+    <p class="interestText">Scientific and clinical data are being collected in massive quantities. Effective data visualizations and analytics are helping to guide scientific research and inform clinicians. I am interested in researching new ways we can use this data.</p>
+	</div>
+	<div class="col span_1_of_3">
+	<h2 class="interestTitle">Machine Learning</h2>
+    <p class="interestText">Machine learning algorithms have substantially advanced many areas of computing. The amount of scientific data available is allowing these algorithms to be applied to complex problems in biomedical research.</p>
+	</div>
+	<div class="col span_1_of_3">
+	<h2 class="interestTitle">Software Tools</h2>
+    <p class="interestText">Software tools are playing a critical role in making powerful and robust computational techniques to the research community. I am interested in helping to develop better tools for computational biology and genomics.</p>
+	</div>
+</div>
+<div class="title partition group">
+	<div class="col span_1_of_3">
+    <h2 class="interestTitle">Genetic Variation</h2>
+    <p class="interestText">While identification and classification of genetic variants has advanced significantly, more work needs to be done in creating more robust tools variant calling and analysis in genomics.</p>
+	</div>
+	<div class="col span_1_of_3">
+	<h2 class="interestTitle">Data Integration</h2>
+    <p class="interestText">I am excited about research that integrates genomic data, such as variants identified by GWAS, with other data sources, such as epigenetic data, tissue expression data, and protein interaction networks to elucidate genomic regulation and identify new targetable pathways implicated in human disease.</p>
+	</div>
+	<div class="col span_1_of_3">
+	<h2 class="interestTitle">Personalized Medicine</h2>
+    <p class="interestText">I am also interested in integration of multiple data sources to advance clinical decision making and move towards the goal of personalized medicine.</p>
+	</div>
+</div>
     </div>
     
     <div class="section" id="Research">
         <h2 class="title  sectionTitle">Research</h2>
-        <p class="sectionText">The following are selected examples of my research projects.</p>
+        <p class="leadText">The following are selected examples of my research projects.</p>
         
         <div class="insitution">
             
             <h3 class="title  insitutionTitle">MacArthur Lab of MGH and the Broad Institute of Harvard and MIT</h3>
-            <p class="sectionText">The <a class="sectionLink" href="http://www.macarthurlab.org/home/">MacArthur Lab</a> focuses on extracting useful information from human genome sequences. Some of the main focuses of the lab are accurate identification of sequence variants from massive data-sets, identifying LoF variants, using transcriptome sequencing approches to characterize the impact of DNA sequence variants on human gene function, and using genomic approaches to discover disease-causing mutations in severe disease patients.</p>
+            <p class="leadText">The <a class="sectionLink" href="http://www.macarthurlab.org/home/">MacArthur Lab</a> focuses on extracting useful information from human genome sequences. Some of the main focuses of the lab are accurate identification of sequence variants from massive data-sets, identifying LoF variants, using transcriptome sequencing approches to characterize the impact of DNA sequence variants on human gene function, and using genomic approaches to discover disease-causing mutations in severe disease patients.</p>
             <div class="project">
                 
                 <h4 class="title  projectTitle"><div class="expand">-</div>Leiden Muscular Dystrophy Variant Database Cleanup</h4>
                 <div class="projectBody">
-                <p class="sectionText">I have created a Python script and OpenRefine recipe to automate data extraction and cleanup from the Leiden muscular dystrophy gene variant databases. I have also converted variants given in HGVS notation (relative to cDNA transcripts) to genomic coordinates and validated the results via annotation in order to facilitate use in large-scale data analytics efforts.</p>
+                <p class="projectText">I have created a Python script and OpenRefine recipe to automate data extraction and cleanup from the Leiden muscular dystrophy gene variant databases. I have also converted variants given in HGVS notation (relative to cDNA transcripts) to genomic coordinates and validated the results via annotation in order to facilitate use in large-scale data analytics efforts.</p>
                 </div>
             </div>
         </div>
         
         <div class="insitution">
             <h3 class="title  insitutionTitle">University of Washington Biorobotics Lab</h3>
-            <p class="sectionText">The mission of the <a class="sectionLink" href="http://brl.ee.washington.edu/">UW Biorobotics Lab (BRL)</a> is to develop science, technology, and human resources at the interface between robotics and biological movement systems. The two main focuses of the lab during my time there were robotic surgery and novel haptic interfaces.</p>
+            <p class="leadText">The mission of the <a class="sectionLink" href="http://brl.ee.washington.edu/">UW Biorobotics Lab (BRL)</a> is to develop science, technology, and human resources at the interface between robotics and biological movement systems. The two main focuses of the lab during my time there were robotic surgery and novel haptic interfaces.</p>
             <div class="project">
                 <h4 class="title  projectTitle"><div class="expand">-</div>Online Modeling of In Vivo Mechanical Properties of Soft Tissue for Robotic Surgery</h4>
                 <div class="projectBody">
-                    <p class="sectionText">I sought to develop an approach to characterize the mechanical properties of soft tissue in real time. Identification of these tissue-specific properties could enable partial-automation of grasping in robotic surgery, preventing unintended damage, and be used to identify different types of healthy and pathological tissue using machine learning algorithms. To address this problem, I designed, built, and programmed a robotic device to collect force and tissue displacement data as it palpated soft-tissue. I used an Unscented Kalman Filter (UKF), a non-linear, recursive filtering algorithm, to identify parameters of several non-linear, dynamic models of soft-tissue from the collected data. I chose the UKF because it allows for simultaneous online identification of tissue model parameters and states of a dynamic system (robot position).  I tested and validated system performance on synthetic tissue and then acquired data from in vivo porcine abdominal organs for future analysis. This highly interdisciplinary project allowed me to hone my skills in advanced signal processing/data analysis algorithms as well as embedded system programming and hardware development. I won a Mary Gates Research Scholarship for my project and presented my work at the 2012 UW Undergraduate Research Symposium.</p>
+                    <p class="projectText">I sought to develop an approach to characterize the mechanical properties of soft tissue in real time. Identification of these tissue-specific properties could enable partial-automation of grasping in robotic surgery, preventing unintended damage, and be used to identify different types of healthy and pathological tissue using machine learning algorithms. To address this problem, I designed, built, and programmed a robotic device to collect force and tissue displacement data as it palpated soft-tissue. I used an Unscented Kalman Filter (UKF), a non-linear, recursive filtering algorithm, to identify parameters of several non-linear, dynamic models of soft-tissue from the collected data. I chose the UKF because it allows for simultaneous online identification of tissue model parameters and states of a dynamic system (robot position).  I tested and validated system performance on synthetic tissue and then acquired data from in vivo porcine abdominal organs for future analysis. This highly interdisciplinary project allowed me to hone my skills in advanced signal processing/data analysis algorithms as well as embedded system programming and hardware development. I won a Mary Gates Research Scholarship for my project and presented my work at the 2012 UW Undergraduate Research Symposium.</p>
                     <span class="downloadLink"><a class="downloadLink" target="_blank" href="documents/Hill_A BRL Final Capstone Writeup.pdf">Download Report (PDF)</a></span>
                 </div>
             </div>
@@ -104,7 +137,7 @@
             <div class="project">
                 <h4 class="title  projectTitle"><div class="expand">-</div>Haptic-Enabled Glove for Musical Performance</h4>
                 <div class="projectBody">
-                    <p class="sectionText">Two graduate students and I developed a glove that allows a user to manipulate sound effects playing in the background by moving their hand in space and bending their fingers as if they were playing an instrument. I co-developed the glove hardware and microcontroller firmware to track finger bending using piezoresistive sensors, actuate vibrating motors with increasing finger bending, and relay sensor data via Bluetooth to a computer. We used a Microsoft Kinect to track the user’s hand position, allowing them to control different sound effects in different locations. As a group, we integrated the data in a music synthesis platform to generate sound effects and vary their volume, speed, and pitch with finger bending. Our project has since been extended in the BRL as a general-purpose device for haptic interaction with virtual environments.</p>
+                    <p class="projectText">Two graduate students and I developed a glove that allows a user to manipulate sound effects playing in the background by moving their hand in space and bending their fingers as if they were playing an instrument. I co-developed the glove hardware and microcontroller firmware to track finger bending using piezoresistive sensors, actuate vibrating motors with increasing finger bending, and relay sensor data via Bluetooth to a computer. We used a Microsoft Kinect to track the user’s hand position, allowing them to control different sound effects in different locations. As a group, we integrated the data in a music synthesis platform to generate sound effects and vary their volume, speed, and pitch with finger bending. Our project has since been extended in the BRL as a general-purpose device for haptic interaction with virtual environments.</p>
                     <div class="embed-container">
                         <iframe src="//www.youtube.com/embed/87eRYUW8C50?rel=0&showinfo=0&autohide=1" frameborder="0" allowfullscreen></iframe>
                     </div>
