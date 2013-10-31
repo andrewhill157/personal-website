@@ -266,7 +266,7 @@ span {
     float: left;
     display: inline-block;
     position: relative;
-    top: 4px;
+    top: 3px;
     
     background-color: #39275B;
     color: white;
@@ -307,23 +307,26 @@ span {
 }
 
 /*Formatting for embedded videos*/
-.embed-container iframe {
+.video-container {
+    position: relative;
+    padding-bottom: 39.25%;
+    padding-top: 30px;
+    height: 0;
+    overflow: hidden;
+    width: 100%;
+    max-width: 840px;
+    margin: 0 auto;
+}
+.video-container iframe,
+.video-container object,
+.video-container embed {
     position: absolute;
     top: 0;
     left: 0;
-    
     width: 100%;
     height: 100%;
-}
 
-.embed-container {
-    position: relative;
-    padding-bottom: 56.25%; /* 16/9 ratio */
-    
-    /* IE6 workaround*/
-    padding-top: 30px; 
-    height: 0;
-    overflow: hidden;
+    max-height: 480px;
 }
 
 /*Formatting for download links*/
