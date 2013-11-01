@@ -57,7 +57,16 @@ function toggleIconText(icons)
 }
     
 // Allow hiding and showing of projects to prevent clutter as number of projects grows 
-$(document).ready(function() {    
+$(document).ready(function() { 
+    
+    // Only maximize the two most recent projects from each institution at startup.
+    $(".insitution").each(function() {
+        var projectsToShow = 2;
+        $(this).find(".projectBody").slice(projectsToShow).hide();
+        var icons = $(this).find(".projectTitle").find(".expand").slice(projectsToShow);
+        toggleIconText(icons);
+    });
+
     // Toggle visibility of all projects by clicking the project section title
     $(".sectionTitle").click(function() {
         var projects = $(this).closest("#Research").find(".insitution").find(".projectBody");
