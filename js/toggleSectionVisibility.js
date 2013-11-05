@@ -10,26 +10,13 @@ function toggleExpanded(elements)
     var openElements = elements.filter(function() {return $(this).is(":visible");}).length;
     
     // Get the icons for the selected project
-    var icons = elements.closest(".project").find(".projectTitle").find(".expand");
+    var icons = elements.closest(".project").find(".projectTitle").find(".expandIcon");
     
     // Toggle/hide/show elements based on relative number of open elements
     var time = 275;
     
-    if (openElements == 0 || openElements == elements.length) 
-    {
-        elements.animate({height: "toggle"}, time, function() { });
-        toggleIconText(icons);
-    }
-    else if(openElements < elements.length/2)
-    {
-        elements.animate({height: "hide"}, time, function() { });
-        setExpandIconText(icons, "+");
-    }
-    else
-    {
-        elements.animate({height: "show"}, time, function() { });
-        setExpandIconText(icons, "-");
-    }
+    elements.animate({height: "toggle"}, time, function() { });
+    toggleIconText(icons);
 }
 
 // Sets the text of the given icons (div.expand) to the specified string value.
@@ -55,30 +42,9 @@ function toggleIconText(icons)
             setExpandIconText($(this), "-");
     }); 
 }
-    
+
 // Allow hiding and showing of projects to prevent clutter as number of projects grows 
 $(document).ready(function() { 
-    
-    // Only maximize the two most recent projects from each institution at startup.
-    $(".insitution").each(function() {
-        var projectsToShow = 2;
-        $(this).find(".projectBody").slice(projectsToShow).hide();
-        var icons = $(this).find(".projectTitle").find(".expand").slice(projectsToShow);
-        toggleIconText(icons);
-    });
-
-    // Toggle visibility of all projects by clicking the project section title
-    $(".sectionTitle").click(function() {
-        var projects = $(this).closest("#Research").find(".insitution").find(".projectBody");
-        toggleExpanded(projects);
-    });    
-    
-    // Toggle visibility of all projects at a given institution by clicking institution title
-    $( ".insitutionTitle").click(function() {
-        var projects = $(this).closest(".insitution").find(".projectBody");
-        toggleExpanded(projects);
-    });
-    
     // Toggle visibility of individual projects by clicking on the project title    
     $(".projectTitle" ).click(function() {
         var projects = $(this).next(".projectBody");

@@ -1,0 +1,24 @@
+/*Formatting for social media links*/
+.socialMediaLinks {
+    height: auto;
+    margin-top: 10px;
+    
+    text-align: center;
+}
+
+.socialMediaLinks img {
+    background: #39275B;
+    
+    height:40px;
+    
+    display: inline;
+    
+    margin-bottom: 4px;
+}
+
+.socialMediaLinks img:hover {
+    transform:scale(1.05);
+    -moz-transform:scale(1.05); 
+    -webkit-transform:scale(1.05);
+    -o-transform:scale(1.05);
+}

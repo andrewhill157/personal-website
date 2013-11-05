@@ -1,0 +1,29 @@
+---
+title: MacArthur Lab
+layout: default
+---  
+
+<div class="section">
+    <h1>University of Washington Biorobotics Lab</h1>    
+    <p class="leadText">The mission of the <a href="http://brl.ee.washington.edu/">UW Biorobotics Lab (BRL)</a> is to develop science, technology, and human resources at the interface between robotics and biological movement systems. The two main focuses of the lab during my time there were robotic surgery and novel haptic interfaces.</p>
+    
+    <a id="capstone" class="anchor"></a>
+    <div class="project">
+        <h4 class="projectTitle"><div class="expandIcon">-</div>Online Modeling of In Vivo Mechanical Properties of Soft Tissue for Robotic Surgery</h4>
+        <div class="projectBody">
+            <p>I sought to develop an approach to characterize the mechanical properties of soft tissue in real time. Identification of these tissue-specific properties could enable partial-automation of grasping in robotic surgery, preventing unintended damage, and be used to identify different types of healthy and pathological tissue using machine learning algorithms. To address this problem, I designed, built, and programmed a robotic device to collect force and tissue displacement data as it palpated soft-tissue. I used an Unscented Kalman Filter (UKF), a non-linear, recursive filtering algorithm, to identify parameters of several non-linear, dynamic models of soft-tissue from the collected data. I chose the UKF because it allows for simultaneous online identification of tissue model parameters and states of a dynamic system (robot position).  I tested and validated system performance on synthetic tissue and then acquired data from in vivo porcine abdominal organs for future analysis. This highly interdisciplinary project allowed me to hone my skills in advanced signal processing/data analysis algorithms as well as embedded system programming and hardware development. I won a Mary Gates Research Scholarship for my project and presented my work at the 2012 UW Undergraduate Research Symposium.</p>
+            <span class="downloadLink"><a class="downloadLink" target="_blank" href="documents/Hill_A BRL Final Capstone Writeup.pdf">Download Report (PDF)</a></span>
+        </div>
+    </div>
+    
+    <a id="haptic-glove" class="anchor"></a>
+    <div class="project">
+        <h4 class="projectTitle"><div class="expandIcon">-</div>Haptic-Enabled Glove for Musical Performance</h4>
+        <div class="projectBody">
+            <p>Two graduate students and I developed a glove that allows a user to manipulate sound effects playing in the background by moving their hand in space and bending their fingers as if they were playing an instrument. I co-developed the glove hardware and microcontroller firmware to track finger bending using piezoresistive sensors, actuate vibrating motors with increasing finger bending, and relay sensor data via Bluetooth to a computer. We used a Microsoft Kinect to track the user’s hand position, allowing them to control different sound effects in different locations. As a group, we integrated the data in a music synthesis platform to generate sound effects and vary their volume, speed, and pitch with finger bending. Our project has since been extended in the BRL as a general-purpose device for haptic interaction with virtual environments.</p>
+            <div class="video-container">
+                <iframe src="//www.youtube.com/embed/87eRYUW8C50?rel=0&showinfo=0&autohide=1" frameborder="0" width="560" height="315" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div> 
+</div>

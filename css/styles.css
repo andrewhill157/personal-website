@@ -1,269 +1,39 @@
 /*Background image for webpage*/
 body {
-    background-image: url('../images/background-pattern.png');
-    
+    color: #39275B;
     font-family: 'Open Sans', sans-serif;
 }
 
 a {
-  color:inherit;
+  color: #007fff;
   text-decoration: none;
 }
 
-/*Container for all page content*/
-.invisibleContainer {
-    background: white;
-    
-    border-left: 2px solid #e1e1e1;
-    border-right: 2px solid #e1e1e1;
-    
-    max-width: 1200px;
-    
-    margin: 0px auto;
-    margin-bottom: 20px;
-    margin-top: 55px;
-    
-    text-align: center;
-}
-
-/*Formatting for the navigation bar*/
-span {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-#header {
-	background: white;
-
-	border-top: 1px solid #e1e1e1;
-	border-bottom: 1px solid #e1e1e1;
-    
-    position: fixed;
-    z-index: 10;
-    top: 0;
-       
-    width: 100%;
-    
-    text-align: center;
-}
-
-#headerWrapper {
-    max-width: 1200px;
-    
-    margin: 0 auto;
-    
-    text-align: right;
-}
-
-#myName {
-    float: left;
-    
-    margin-left: 10px;
-    
-    font-family: 'Open Sans', sans-serif;
-	font-size: 40px;
-    color: #39275B;
-    font-weight: 700;
-}
-
-#navigationLinks {
-    margin-left: 0;
-    margin-right: 10px;
-}
-
-#navigationLinks ul {
-    padding: 0;   
-}
-
-#navigationLinks li {
-	display: inline;
-    
-	padding: 14px 10px 14px 10px;
-    margin: 0;
-    
-    cursor: pointer;
-    
-    color: #39275B;
-}
-
-#navigationLinks li:hover {
-    background-color: #e1e1e1;
-    
-    border-bottom: 4px  solid rgba(57, 39, 91, 1);
-}
-
-/*Formatting for photo*/
-#headshot img {
-    float: left;
-    
-    display: block;
-    height: auto;
-    max-width: 100%;
-    
-    
-    margin-right: 20px;
-    
-    border: 2px solid #e1e1e1;
-}
-
-/*Formatting for sections*/
-.section {
-    overflow: hidden;
-    padding: 20px 4% 20px 4%;
-    
-    border-bottom: 1px solid #C79900;
-    
-    text-align: justify;   
-}
-
-.leadText {
-    margin: 0; 
-    margin-bottom: 15px;
-    
-    font-size: 20px;
-    font-weight: 200;
-}
-
-
-.sectionLink:hover {
+a:hover {
     text-decoration: underline;
 }
 
-.smallIcon {
-    height: 25px;
-    margin-right: 5px;
+/* Trick to get shift anchor links above target to account for fixed navigation bar */
+a.anchor {
+	display: block;
+	position: relative;
+	top: -57px;
+	visibility: hidden;
 }
 
-.interestTitle {
-    margin-bottom: 0px;
-}
-
-.interestText {
-    margin-top: 0px;
-    
-}
-
-.project {
-    margin-bottom: 20px;
-}
-
-/*Formatting for section titles*/
-.title {
-    color: #39275B; 
-    
+/*Formatting for headings*/
+h1, h2, h3, h4, h5, h6 {
     margin-bottom: 5px;
     margin-top: 15px;
-    
     text-align: left;
 } 
 
-.sectionTitle {
-    font-size: 35px;
+.undecorated {
+    color: inherit;
 }
 
-#Research .sectionTitle {cursor: pointer;}
-
-#Research .sectionTitle:hover {color: #C79900;}
-
-.insitutionTitle {
-    margin-bottom: 5px;
-    font-size: 25px;
-    cursor: pointer;
-}
-
-.insitutionTitle:hover {color: #C79900;}
-
-.projectTitle {
-    font-size: 20px;
-}
-
-.projectTitle:hover {
-    cursor: pointer;
-    
-    color: #C79900;
-}
-
-.projectBody {
-    font-size: 17px;
-    font-weight: 800;
-    margin-left: 8px;
-    padding-left: 7px;
-    border-left: 1px solid #C79900;
-}
-
-.projectText {
-    font-weight: 400;   
-}
-
-.expand {
-    text-align: center;
-    font-weight: 400;
-    font-size: 15px;
-    
-    float: left;
-    display: inline-block;
-    position: relative;
-    top: 3px;
-    
-    background-color: #39275B;
-    color: white;
-    
-    width: 21px;
-    height: 21px;
-    
-    margin-right: 3px;
-}
-
-.projectTitle:hover > .expand {
-    background-color: #C79900;
-}
-
-/*Formatting for social media links*/
-#socialMediaLinks {
-    height: auto;
-    margin-top: 10px;
-    
-    text-align: center;
-}
-
-#socialMediaLinks img {
-    background: #39275B;
-    
-    height:40px;
-    
-    display: inline;
-    
-    margin-bottom: 4px;
-}
-
-#socialMediaLinks img:hover {
-    transform:scale(1.05);
-    -moz-transform:scale(1.05); 
-    -webkit-transform:scale(1.05);
-    -o-transform:scale(1.05);
-}
-
-/*Formatting for embedded videos*/
-.video-container {
-    position: relative;
-    padding-bottom: 39.25%;
-    padding-top: 30px;
-    height: 0;
-    overflow: hidden;
-    width: 100%;
-    max-width: 840px;
-    margin: 0 auto;
-}
-.video-container iframe,
-.video-container object,
-.video-container embed {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-
-    max-height: 480px;
+.undecorated:hover {
+    text-decoration: none;
 }
 
 /*Formatting for download links*/
@@ -283,6 +53,7 @@ span {
     -webkit-transform:scale(1.02);
     -o-transform:scale(1.02);
     transform:scale(1.02);
+    text-decoration: none;
 }
 
 .downloadLink a {
@@ -291,49 +62,73 @@ span {
     font-weight: 400;
 }
 
-/*Copyright text formatting*/
-#copyright {
-    text-align: center;
-    font-size: 14px;
-    color: gray; 
+p {
+    font-weight: 400;   
+}
+
+.leadText {
+    margin: 0; 
+    margin-bottom: 15px;
     
-    margin-bottom: 30px;
+    font-size: 20px;
+    font-weight: 200;
+}
+
+/*Container for all page content*/
+.container {
+    max-width: 1200px;
+    
+    margin: 0px auto;
+    margin-bottom: 20px;
+    margin-top: 55px;
+    
+    text-align: center;
+}
+
+/*Formatting for sections*/
+.section {
+    overflow: hidden;
+    padding: 20px 4% 20px 4%;
+    
+    border-bottom: 1px solid #C79900;
+    
+    text-align: justify;   
+}
+
+.smallIcon {
+    height: 25px;
+    margin-right: 5px;
+}
+
+/*Formatting for embedded videos*/
+.video-container {
+    position: relative;
+    padding-bottom: 39.25%;
+    padding-top: 30px;
+    height: 0;
+    overflow: hidden;
+    width: 100%;
+    max-width: 840px;
+    margin: 0 auto;
+}
+
+.video-container iframe,
+.video-container object,
+.video-container embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    max-height: 480px;
 }
 
 /*Different name and header format for smaller screens*/
 @media only screen and (max-device-width: 500px) {
-    #myName {
-        font-size: 25px;
-        position: relative;
-        top: 2px;
-    }
     
-    #navigationLinks ul {
-        margin-top: 10px;
-        padding: 0;
-        margin: 0;
-        position: relative;
-        top: 8px;
-    }
-    
-    #navigationLinks li {
-        padding: 7px 5px 7px 5px;
-    }
-    
-    .projectText, .leadText, .title{
+    p {
         text-align: left;
-    }
-    
-    #headerWrapper {
-        margin: 0;
-        height: 40px;
-    }
-    
-    #headerWrapper span {
-        display: block;
-        padding: 0;
-        margin-right: 2px;
-        margin-left: 2px; 
     }
     
     .invisibleContainer {
@@ -343,20 +138,7 @@ span {
 
 /*Different name and header format for even smaller screens*/
 @media (max-width: 425px) {
-    #myName {
-        float: none;
-        margin: 0 auto;
-    }
-
-    #navigationLinks li {
-        padding: 7px 5px 4px 5px;
-    }
-    
-    #headerWrapper {
-        text-align: center;
-        height: 70px;
-    }
-    
+ 
     .invisibleContainer {
         margin-top: 68px;   
     }

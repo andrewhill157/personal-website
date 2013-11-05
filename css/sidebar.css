@@ -1,0 +1,19 @@
+.sidebar .socialMediaLinks {
+	text-align: left;
+}
+
+.sidebar ul {
+	list-style: none;
+	text-align: left;
+	padding: 0;
+}
+
+.sidebar ul li {
+
+
+}
+
+.sideBarLabel {
+	padding-bottom: 10px;
+	border-bottom: 1px solid #e1e1e1;
+}

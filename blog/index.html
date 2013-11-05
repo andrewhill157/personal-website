@@ -1,0 +1,44 @@
+---
+title: Blog
+layout: blog
+---
+{% for post in paginator.posts %}
+<div class="section blogpost">
+  <img class="thumbnail" src={{post.thumbnail}}>
+  <h2>{{ post.title }}</h2>
+  <h2 class="postDate">{{ post.date | date_to_long_string }}</h2>
+  <p class="leadText">
+    {{ post.excerpt }}
+  </p>
+  <a href="{{ post.url }}">Read Post &#10148</a>
+</div>
+{% endfor %}
+
+<ul class="pagesNavigation">
+  {% if paginator.previous_page %}
+  {% if paginator.previous_page == 1 %}
+  <a href="/blog"><li>Prev</li></a>
+  {% else %}
+  <a href="/blog/page{{ paginator.previous_page }}"><li>Prev</li></a>
+  {% endif %}
+  {% else %}
+  <li class="disabled">Prev</li>
+  {% endif %}
+  {% if paginator.page == 1 %}
+  <li class="active">1</li>
+  {% else %}
+  <a href="/blog"><li>1</li></a>
+  {% endif %}
+  {% for count in (2..paginator.total_pages) %}
+  {% if count == paginator.page %}
+  <li class="active">{{ count }}</li>
+  {% else %}
+  <a href="/blog/page{{ count }}"><li>{{ count }}</li></a>
+  {% endif %}
+  {% endfor %}
+  {% if paginator.next_page %}
+  <a href="/blog/page{{ paginator.next_page }}"><li>Next</li></a>
+  {% else %}
+  <li class="disabled">Next</li>
+  {% endif %}
+</ul>

@@ -1,0 +1,17 @@
+{% include header.html %}
+<div class="partition group">
+	<div class="col span_2_of_3">
+		<div class="section post">
+		 <img class="thumbnail" src={{page.thumbnail}}>
+		 <h1>{{ page.title }}</h1>
+    	<h2 class="postDate">{{ page.date | date_to_long_string }} {% include sharePostButtons.html %}</h2>
+			{{ content }}
+	</div>
+</div>
+	<div class="col span_1_of_3">
+		{% include sidebar.html %}
+	</div>
+</div>
+<h4>Share This Post:<h4>
+{% include sharePostButtons.html %}
+{% include footer.html %}

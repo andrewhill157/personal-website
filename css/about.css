@@ -1,0 +1,20 @@
+/*Formatting for photo*/
+#headshot img {
+    float: left;
+    
+    display: block;
+    height: auto;
+    max-width: 100%;
+    
+    margin-right: 20px;
+    
+    border: 2px solid #e1e1e1;
+}
+
+#interests h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 0px;
+}
+
+#interests p {
+    margin-top: 0px;
+}
