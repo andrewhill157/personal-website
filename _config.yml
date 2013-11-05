@@ -1,6 +1,8 @@
 name: "Andrew John Hill"
 description: "Professional website of Andrew John Hill"
 
+exclude: ["social icons (unused)"]
+
 url: "http://localhost:4000"
 
 paginate: 5
