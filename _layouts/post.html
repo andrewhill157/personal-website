@@ -6,12 +6,12 @@
 		 <h1>{{ page.title }}</h1>
     	<h2 class="postDate">{{ page.date | date_to_long_string }} {% include sharePostButtons.html %}</h2>
 			{{ content }}
+			<h4>Share This Post:<h4>
+			{% include sharePostButtons.html %}
 	</div>
 </div>
 	<div class="col span_1_of_3">
 		{% include sidebar.html %}
 	</div>
 </div>
-<h4>Share This Post:<h4>
-{% include sharePostButtons.html %}
 {% include footer.html %}
