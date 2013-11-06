@@ -3,7 +3,7 @@ description: "Professional website of Andrew John Hill"
 
 exclude: ["social icons (unused)"]
 
-url: "http://localhost:4000"
+url: "http://www.andrewjohnhill.com"
 
 paginate: 5
 paginate_path: blog/page:num
