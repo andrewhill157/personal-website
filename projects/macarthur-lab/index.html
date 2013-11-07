@@ -5,7 +5,7 @@ layout: default
 <div class="section">
     <h1>MacArthur Lab of MGH and the Broad Institute of Harvard and MIT</h1>  
 
-    <p class="leadText">The <a href="http://www.macarthurlab.org/home/">MacArthur Lab</a> focuses on extracting useful information from human genome sequences. Some of the main focuses of the lab are accurate identification of sequence variants from massive data-sets, identifying LoF variants, using transcriptome sequencing approches to characterize the impact of DNA sequence variants on human gene function, and using genomic approaches to discover disease-causing mutations in severe disease patients.</p>
+    <p class="leadText">The <a href="http://www.macarthurlab.org/home/">MacArthur Lab</a> focuses on extracting useful information from human genome sequences. Some of the main focuses of the lab are accurate identification of sequence variants from massive data-sets, identifying LoF variants, using transcriptome sequencing approaches to characterize the impact of DNA sequence variants on human gene function, and using genomic approaches to discover disease-causing mutations in severe disease patients.</p>
 
     <a id="project2" class="anchor"></a>
     <div class="project">
@@ -19,7 +19,9 @@ layout: default
     <div class="project">
         <h4 class="projectTitle"><div class="expandIcon">-</div>Leiden Muscular Dystrophy Variant Database Cleanup</h4>
         <div class="projectBody">
-            <p>I have created a Python script and OpenRefine recipe to automate data extraction and cleanup from the Leiden muscular dystrophy gene variant databases. I have also converted variants given in HGVS notation (relative to cDNA transcripts) to genomic coordinates and validated the results via annotation in order to facilitate use in large-scale data analytics efforts.</p>
+            <p>I have created a Python script and <a href="http://openrefine.org/">OpenRefine</a> recipe to automate data extraction and cleanup from the Leiden muscular dystrophy gene variant databases. These databases contain a huge amount of potentially useful information for the muscular dystrophy research community, but are very messy and contain data in inconvenient formats and genomic coordinate mappings.</p>
+			<p>One of the most significant barriers to large-scale data analytics with its current format is the use of HGVS notation relative to cDNA transcripts. These coordinates require knowledge of a specific reference transcript in order to yield unambiguous variant locations. While this may be suitable in clinical settings, many in the bioinformatics community prefer genomic coordinates in VCF format.</p>
+			<p>I have performed automated mapping on all SNPs and indels for several genes implicated in muscular dystrophy including ACTA1 and DYSF. We are currently validating the results via annotation and further quality-checking results by examining overlap with the HGMD, allele frequencies, and publication records. Our goal is to make these new datasets openly-accessible to the research community via the ClinVar Database.</p>
         </div>
     </div>
 </div>
