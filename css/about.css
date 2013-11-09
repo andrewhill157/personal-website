@@ -1,6 +1,6 @@
+---
+---
 /*Formatting for photo*/
-
-
 #headshot img {
     display: block;
     height: auto;
@@ -10,7 +10,7 @@
     background-color: white;
 
     padding: 5px;
-    border: 1.5px solid #e1e1e1;
+    border: 1.5px solid {% include colors.md param="lightSecondary" %};
     float: left;
 }
 

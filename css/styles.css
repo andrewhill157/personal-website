@@ -1,12 +1,14 @@
+---
+---
 /*Background image for webpage*/
 body {
-    color: #39275B;
+    color: {% include colors.md param="darkText" %};
     font-family: 'Open Sans', sans-serif;
-    background-color: #FDFDFD;
+    background-color: {% include colors.md param="background" %};
 }
 
 a {
-  color: #007fff;
+  color: {% include colors.md param="link" %};
   text-decoration: none;
 }
 
@@ -27,6 +29,7 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 5px;
     margin-top: 15px;
     text-align: left;
+    color: {% include colors.md param="headingText" %}
 } 
 
 .undecorated {
@@ -39,21 +42,19 @@ h1, h2, h3, h4, h5, h6 {
 
 /*Formatting for download links*/
 .downloadLink {
-    text-decoration: none;
     
-    color: white;
-    
-    background-color: #39275B;
+    color: {% include colors.md param="lightText" %};
+    background-color: {% include colors.md param="darkPrimary" %};
     
     margin-top: 10px;
     margin-bottom: 10px;
 }
 
-.downloadLink:hover {
-    -moz-transform:scale(1.02); 
-    -webkit-transform:scale(1.02);
-    -o-transform:scale(1.02);
-    transform:scale(1.02);
+.downloadLink a:hover {
+    -moz-transform: scale(1.02); 
+    -webkit-transform: scale(1.02);
+    -o-transform: scale(1.02);
+    transform: scale(1.02);
     text-decoration: none;
 }
 
@@ -84,7 +85,7 @@ p {
     margin-top: 55px;
     
     text-align: center;
-    background-color: #FDFDFD;
+    background-color: {% include colors.md param="container" %};;
 }
 
 /*Formatting for sections*/
@@ -92,7 +93,7 @@ p {
     overflow: hidden;
     padding: 20px 4% 20px 4%;
     
-    border-bottom: 1px solid #C79900;
+    border-bottom: 1px solid {% include colors.md param="darkSecondary" %};
     
     text-align: justify;   
 }
