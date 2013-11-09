@@ -26,3 +26,11 @@
 #interests p {
     margin-top: 0px;
 }
+
+@media only screen and (max-device-width: 500px) {
+
+    #headshot img {
+        float: none;
+        margin: 0 auto; 
+    }
+}
