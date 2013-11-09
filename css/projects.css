@@ -3,18 +3,19 @@
  
   overflow: hidden;
   
-  border: 10px solid #e1e1e1;
-  box-shadow: 2px 2px 5px #888888;
+  border: 10px solid white;
+  box-shadow: 1px 1px 1px 1px #888888;
 }
 
 .projectThumbnailBody img {
   position: relative;
   overflow: hidden;
-  width: 100%;
+  width: 99.5%;
+  border: 1px solid #e1e1e1;
 }
 
 .projectThumbnailBody p {
-  color: rgba(255,255,255,1);
+  color: white;
   background-color: rgba(57, 39, 91, 0.9);
   padding: 10px;
   line-height: 28px;
@@ -23,7 +24,7 @@
   bottom: 0;
   margin: 0;
   height: 30px;
-  width: 100%;
+  width: 95%;
   font-weight: 600;
   transition: height .2s;
   -webkit-transition: height .2s;
@@ -43,8 +44,6 @@
 .projectThumbnailBody:hover p small  {
   opacity: 1; 
 }
-
-
 
 
 .project {

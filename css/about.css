@@ -1,14 +1,23 @@
 /*Formatting for photo*/
+
+
 #headshot img {
-    float: left;
-    
     display: block;
     height: auto;
-    max-width: 100%;
+    max-width: 90%;
     
     margin-right: 20px;
-    
-    border: 2px solid #e1e1e1;
+    border-radius: 5px;
+    background-color: white;
+
+    padding: 11px;
+    border: 1.5px solid #e1e1e1;
+    float: left;
+}
+
+#about {
+	text-align: center;
+
 }
 
 #interests h1, h2, h3, h4, h5, h6 {

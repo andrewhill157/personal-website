@@ -12,7 +12,7 @@ nav span {
     height: 60;
     
     position: fixed;
-    z-index: 10;
+    z-index: 1;
     top: 0;
        
     width: 100%;
@@ -73,7 +73,7 @@ nav span {
     #header {
         position: static;
     }
-    
+
     #myName {
         font-size: 25px;
         position: relative;
