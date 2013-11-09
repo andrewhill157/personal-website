@@ -21,7 +21,7 @@
 
 .projectThumbnailBody p {
   color: white;
-  background-color: {% include colors.md param="darkPrimary" %};
+  background-color: {% include colors.md param="projectLabel" %};
   opacity: .90;
   padding: 10px;
   line-height: 28px;

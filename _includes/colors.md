@@ -29,6 +29,9 @@ white
 {% elsif include.param == "link" %}
 #007fff
 
+{% elsif include.param == "projectLabel" %}
+#39275B
+
 {% elsif include.param == "shadow"%}
 #888888
 {% endif %}
