@@ -2,7 +2,7 @@
 body {
     color: #39275B;
     font-family: 'Open Sans', sans-serif;
-    background-color: white;
+    background-color: #FDFDFD;
 }
 
 a {
@@ -84,7 +84,7 @@ p {
     margin-top: 55px;
     
     text-align: center;
-    background-color: white;
+    background-color: #FDFDFD;
 }
 
 /*Formatting for sections*/
