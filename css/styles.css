@@ -126,20 +126,23 @@ p {
 
 /*Different name and header format for smaller screens*/
 @media only screen and (max-device-width: 500px) {
-    
     p {
         text-align: left;
     }
     
-    .invisibleContainer {
-        margin-top: 42px; 
+    .container {
+        margin-top: 0;
+    }
+
+    a.anchor {
+        display: block;
+        position: relative;
+        top: 0px;
+        visibility: hidden;
     }
 }
 
 /*Different name and header format for even smaller screens*/
 @media (max-width: 425px) {
  
-    .invisibleContainer {
-        margin-top: 68px;   
-    }
 }

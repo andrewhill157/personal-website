@@ -9,6 +9,7 @@ nav span {
 
 	border-top: 1px solid #e1e1e1;
 	border-bottom: 1px solid #e1e1e1;
+    height: 60;
     
     position: fixed;
     z-index: 10;
@@ -69,7 +70,10 @@ nav span {
 }
 
 @media only screen and (max-device-width: 500px) {
-
+    #header {
+        position: static;
+    }
+    
     #myName {
         font-size: 25px;
         position: relative;
@@ -102,6 +106,7 @@ nav span {
 }
 
 @media (max-width: 425px) {
+
     #myName {
         float: none;
         margin: 0 auto;
