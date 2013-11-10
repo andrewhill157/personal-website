@@ -2,6 +2,7 @@
 title: Blog
 layout: blog
 ---
+<!-- Display recent posts  -->
 {% for post in paginator.posts %}
 <div class="section blogpost">
   <img class="thumbnail" src={{post.thumbnail}}>
@@ -14,6 +15,7 @@ layout: blog
 </div>
 {% endfor %}
 
+<!-- Links to additional pages of posts -->
 <ul class="pagesNavigation">
   {% if paginator.previous_page %}
   {% if paginator.previous_page == 1 %}

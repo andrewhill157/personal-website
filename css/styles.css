@@ -1,3 +1,4 @@
+/* Base formatting for all pages. Note all colors are seperated into colors.css */
 /*Background image for webpage*/
 body {
     color: {% include colors.md param="bodyText" %};
@@ -90,6 +91,7 @@ p {
     text-align: justify;   
 }
 
+/*Formatting for small icons such as those in interest section*/
 div.smallIcon {
     height: 32px;
     width: 32px;
