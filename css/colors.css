@@ -46,3 +46,7 @@ body, .container, #header {
 #headshot img {
 	background-color: white;
 }
+
+a {
+	color: #007fff;
+}

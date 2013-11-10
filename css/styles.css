@@ -1,13 +1,10 @@
 /* Base formatting for all pages. Note all colors are seperated into colors.css */
 /*Background image for webpage*/
 body {
-    color: {% include colors.md param="bodyText" %};
     font-family: 'Open Sans', sans-serif;
-    background-color: {% include colors.md param="background" %};
 }
 
 a {
-  color: {% include colors.md param="link" %};
   text-decoration: none;
 }
 
