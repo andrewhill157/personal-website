@@ -5,8 +5,8 @@ layout: blog
 <!-- Display recent posts  -->
 {% for post in paginator.posts %}
 <div class="section blogpost">
-  <img class="thumbnail" src={{post.thumbnail}}>
-  <h2>{{ post.title }}</h2>
+  <a class="undecorated" href="{{ post.url }}"><img class="thumbnail" src={{post.thumbnail}}></a>
+  <a class="undecorated" href="{{ post.url }}"><h2>{{ post.title }}</h2></a>
   <h2 class="postDate">{{ post.date | date_to_long_string }}</h2>
   <p class="leadText">
     {{ post.excerpt }}
