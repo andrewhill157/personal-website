@@ -74,17 +74,6 @@
 
 @media(min-device-width: 700px) {
 
-  .projectThumbnailBody:hover {
-    transform:scale(1.03);
-    -moz-transform:scale(1.03); 
-    -webkit-transform:scale(1.03);
-    -o-transform:scale(1.03);
-  }
-
-  .projectThumbnailBody:hover > img {
-
-  }
-
   .projectThumbnailBody:hover > p{
     height: 90px;
   }
