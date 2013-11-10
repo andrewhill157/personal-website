@@ -1,8 +1,6 @@
----
----
 /*Background image for webpage*/
 body {
-    color: {% include colors.md param="darkText" %};
+    color: {% include colors.md param="bodyText" %};
     font-family: 'Open Sans', sans-serif;
     background-color: {% include colors.md param="background" %};
 }
@@ -29,7 +27,6 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 5px;
     margin-top: 15px;
     text-align: left;
-    color: {% include colors.md param="headingText" %}
 } 
 
 .undecorated {
@@ -42,10 +39,6 @@ h1, h2, h3, h4, h5, h6 {
 
 /*Formatting for download links*/
 .downloadLink {
-    
-    color: {% include colors.md param="lightText" %};
-    background-color: {% include colors.md param="darkPrimary" %};
-    
     margin-top: 10px;
     margin-bottom: 10px;
 }
@@ -85,7 +78,6 @@ p {
     margin-top: 55px;
     
     text-align: center;
-    background-color: {% include colors.md param="container" %};;
 }
 
 /*Formatting for sections*/
@@ -93,14 +85,26 @@ p {
     overflow: hidden;
     padding: 20px 4% 20px 4%;
     
-    border-bottom: 1px solid {% include colors.md param="darkSecondary" %};
+    border-bottom: 1px solid;
     
     text-align: justify;   
 }
 
-.smallIcon {
-    height: 25px;
+div.smallIcon {
+    height: 32px;
+    width: 32px;
+    border-radius: 100%;
+
     margin-right: 5px;
+
+    display: inline-table;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.smallIcon img {
+    height: 20px;
+    width: 20px;
 }
 
 /*Formatting for embedded videos*/

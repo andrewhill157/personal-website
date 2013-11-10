@@ -1,0 +1,45 @@
+h1, h2, h3, h4, h5, h6,
+#myName,
+#navigationLinks li {
+	color: #39275B;	
+}
+
+#navigationLinks li:hover,
+.codeblock {
+	border-color: #39275B;
+}
+
+.downloadLink,
+.projectThumbnailBody p, .expandIcon,
+.smallIcon,
+.socialMediaLinks img {
+	background-color: #39275B;
+}
+
+body, .container, #header {
+	background-color: #FDFDFD;
+}
+
+.section, .projectBody {
+	border-color: #C79900;
+}
+
+#headshot img, 
+#header, 
+.sideBarLabel {
+	border-color: #e1e1e1;
+}
+
+#navigationLinks li:hover,
+.codeblock {
+	background-color: #e1e1e1;
+}
+
+.downloadLink, 
+.expandIcon {
+	color: white;
+}
+
+#headshot img {
+	background-color: white;
+}

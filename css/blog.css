@@ -1,8 +1,6 @@
----
----
+
  .codeblock {
-	background-color: {% include colors.md param="lightSecondary" %};
-	border-left: 4px solid {% include colors.md param="darkPrimary" %};
+	border-left: 4px solid;
 	padding-left: 5px;
 	white-space: pre-wrap;
 	border-radius: 0 5px 5px 0;

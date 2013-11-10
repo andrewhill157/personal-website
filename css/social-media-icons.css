@@ -1,5 +1,3 @@
----
----
 /*Formatting for social media links*/
 .socialMediaLinks {
     height: auto;
@@ -9,7 +7,6 @@
 }
 
 .socialMediaLinks img {
-    background: {% include colors.md param="darkPrimary" %};;
     
     height:40px;
     

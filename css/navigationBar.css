@@ -1,5 +1,3 @@
----
----
 /*Formatting for the navigation bar*/
 nav span {
     display: inline-block;
@@ -7,10 +5,7 @@ nav span {
 }
 
 #header {
-	background-color: {% include colors.md param="header" %};
-
-	border-top: 1px solid {% include colors.md param="lightSecondary" %};
-	border-bottom: 1px solid {% include colors.md param="lightSecondary" %};
+	border-bottom: 1px solid;
     height: 60;
     
     position: fixed;
@@ -37,7 +32,7 @@ nav span {
     
     font-family: 'Open Sans', sans-serif;
 	font-size: 40px;
-    color: {% include colors.md param="headerText" %};
+
     font-weight: 700;
 }
 
@@ -57,8 +52,6 @@ nav span {
     margin: 0;
     
     cursor: pointer;
-    
-    color: {% include colors.md param="headerText" %};
 }
 
 #navigationLinks a:hover {
@@ -66,9 +59,8 @@ nav span {
 }
 
 #navigationLinks li:hover {
-    background-color: {% include colors.md param="lightSecondary" %};
     text-decoration: none;
-    border-bottom: 4px  solid {% include colors.md param="darkPrimary" %};;
+    border-bottom: 4px  solid;
 }
 
 @media only screen and (max-device-width: 500px) {

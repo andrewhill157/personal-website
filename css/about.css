@@ -1,5 +1,3 @@
----
----
 /*Formatting for photo*/
 #headshot img {
     display: block;
@@ -7,10 +5,10 @@
     max-width: 90%;
     
     margin-right: 20px;
-    background-color: white;
 
     padding: 5px;
-    border: 1.5px solid {% include colors.md param="lightSecondary" %};
+    border: 1px solid;
+    
     float: left;
 }
 
