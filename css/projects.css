@@ -73,7 +73,7 @@
   margin-right: 3px;
 }
 
-@media(min-device-width: 700px) {
+@media(min-width: 700px) {
 
   .projectThumbnailBody:hover > p{
     height: 90px;

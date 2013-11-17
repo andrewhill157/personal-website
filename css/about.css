@@ -17,17 +17,17 @@
 	text-align: center;
 }
 
-/*Fomatting for interest section text*/
+/*Formatting for interest section text*/
 #interests h1, h2, h3, h4, h5, h6 {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 #interests p {
-    margin-top: 0px;
+    margin-top: 0;
 }
 
 /*Prevent poor text wrapping around picture on small screens*/
-@media only screen and (max-device-width: 500px) {
+@media only screen and (max-width: 500px) {
     #headshot img {
         float: none;
         margin: 0 auto; 

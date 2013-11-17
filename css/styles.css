@@ -1,5 +1,5 @@
-/* Base formatting for all pages. Note all colors are seperated into colors.css */
-/*Background image for webpage*/
+/* Base formatting for all pages. Note all colors are separated into colors.css */
+/*Background image for web page*/
 body {
     font-family: 'Open Sans', sans-serif;
 }
@@ -60,9 +60,8 @@ p {
 }
 
 .leadText {
-    margin: 0; 
-    margin-bottom: 15px;
-    
+    margin: 0 0 15px;
+
     font-size: 20px;
     font-weight: 200;
 }
@@ -70,11 +69,9 @@ p {
 /*Container for all page content*/
 .container {
     max-width: 1200px;
-    
-    margin: 0px auto;
-    margin-bottom: 20px;
-    margin-top: 55px;
-    
+
+    margin: 55px auto 20px;
+
     text-align: center;
 }
 
@@ -131,7 +128,7 @@ div.smallIcon {
 }
 
 /*Different name and header format for smaller screens*/
-@media only screen and (max-device-width: 500px) {
+@media only screen and (max-width: 500px) {
     p {
         text-align: left;
     }
