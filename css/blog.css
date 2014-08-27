@@ -1,11 +1,27 @@
 /*Fomatting specific to blog page or blog post pages*/
- .codeblock {
+ pre {
 	border-left: 4px solid;
 	padding-left: 5px;
 	white-space: pre-wrap;
 	border-radius: 0 5px 5px 0;
 }
 
+blockquote {
+	font-size: 20pt;
+	font-weight: bold;
+	font-style: italic;
+}
+
+.figure img {
+	width: 100%;
+}
+
+.figure p {
+	text-align: center;
+	font-size: 10pt;
+	font-weight: bold;
+	margin-top: 0px;
+}
 
 .thumbnail  {
 	width: 100%;
@@ -37,3 +53,4 @@
 .disabled:hover {
 	text-decoration: none;
 }
+

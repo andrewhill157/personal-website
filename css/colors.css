@@ -2,14 +2,19 @@
 Allows for easy color theme changes.
 */
 h1, h2, h3, h4, h5, h6,
+blockquote,
 #myName,
 #navigationLinks li {
 	color: #39275B;	
 }
 
 #navigationLinks li:hover,
-.codeblock {
+pre {
 	border-color: #39275B;
+}
+
+.figure {
+	color: #717171;
 }
 
 .downloadLink,
@@ -34,7 +39,7 @@ body, .container, #header {
 }
 
 #navigationLinks li:hover,
-.codeblock {
+pre {
 	background-color: #e1e1e1;
 }
 
