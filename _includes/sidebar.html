@@ -1,9 +1,5 @@
 <!-- Side bar with recent blog posts and other links -->
 <div class="sidebar">
-	<h3 class="title sideBarLabel">Subscribe</h3>
-	<div class="socialMediaLinks">
-		<a href="/feed.xml"><img src="/images/social icons/rss.svg" class="tooltip" title="RSS: Subscribe to Blog"></a>
-	</div>
 	<h3 class="sideBarLabel">Recent posts</h3>
 	<ul>
 		{% for post in site.posts limit: 5 %}
