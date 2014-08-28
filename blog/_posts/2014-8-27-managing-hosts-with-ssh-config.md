@@ -46,7 +46,7 @@ Now commands like the following automatically work:
 Let's say you want to increase the activity timeout on all hosts. Rather than changing all of your aliases, you can simply add the following to your `~/.ssh/config`:
 
     Host *
-        ServerAliveInterval 240
+        ServerAliveInterval 100
         
 Note that for this particular option, you have to `chmod 600 ~/.ssh/config` so it is not world-readable.
 
