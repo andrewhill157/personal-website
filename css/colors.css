@@ -10,7 +10,7 @@ blockquote,
 
 #navigationLinks li:hover,
 pre {
-	border-color: #39275B;
+	border-color: #dddddd;
 }
 
 .figure {
@@ -38,9 +38,14 @@ body, .container, #header {
 	border-color: #e1e1e1;
 }
 
+code {
+	border-color: #dddddd;
+}
+
 #navigationLinks li:hover,
-pre {
-	background-color: #e1e1e1;
+pre,
+code {
+	background-color: #f8f8f8;
 }
 
 .downloadLink, 

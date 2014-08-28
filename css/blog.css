@@ -1,9 +1,20 @@
 /*Fomatting specific to blog page or blog post pages*/
  pre {
 	border-left: 4px solid;
+	border-top: 1px solid;
+	border-right: 1px solid;
+	border-bottom: 1px solid;
 	padding-left: 5px;
 	white-space: pre-wrap;
 	border-radius: 0 5px 5px 0;
+}
+
+pre code {
+	border: none;
+}
+
+code {
+	border: 1px solid;
 }
 
 blockquote {
