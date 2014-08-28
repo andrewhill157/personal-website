@@ -8,7 +8,10 @@ blockquote,
 	color: #39275B;	
 }
 
-#navigationLinks li:hover,
+#navigationLinks li:hover {
+	border-color: #39275B;
+}
+
 pre {
 	border-color: #dddddd;
 }
@@ -33,13 +36,12 @@ body, .container, #header {
 	background-color: #FDFDFD;
 }
 
-.section, .projectBody {
-	border-color: #C79900;
-}
 
 #headshot img, 
 #header, 
-.sideBarLabel {
+.sideBarLabel,
+.section,
+.projectBody {
 	border-color: #e1e1e1;
 }
 
