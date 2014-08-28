@@ -20,8 +20,13 @@ pre {
 .downloadLink,
 .projectThumbnailBody p, .expandIcon,
 .smallIcon,
-.socialMediaLinks img {
+.socialMediaLinks img,
+.tag {
 	background-color: #39275B;
+}
+
+.tag {
+	color: white;
 }
 
 body, .container, #header {

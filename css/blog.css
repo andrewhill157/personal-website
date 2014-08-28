@@ -9,6 +9,10 @@
 	border-radius: 0 5px 5px 0;
 }
 
+li {
+	text-align: left;
+}
+
 pre code {
 	border: none;
 }
@@ -45,6 +49,7 @@ blockquote {
 }
 
 .pagesNavigation {
+	text-align: center;
 	list-style-type: none;
 	font-weight: 400;
     margin: 10px auto 0;
@@ -63,5 +68,12 @@ blockquote {
 
 .disabled:hover {
 	text-decoration: none;
+}
+
+.tag {
+	font-size: 11pt;
+	border-radius: 5px;
+	padding: 2px;
+	margin: 3px;
 }
 
