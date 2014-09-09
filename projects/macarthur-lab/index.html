@@ -6,15 +6,31 @@ layout: default
 <div class="section">
     <h1>MacArthur Lab of MGH and the Broad Institute of MIT and Harvard</h1>  
 
-    <p class="leadText">The <a href="http://www.macarthurlab.org/home/">MacArthur Lab</a> focuses on extracting useful information from human genome sequences. Some of the main focuses of the lab are accurate identification of sequence variants from massive data-sets, identifying LoF variants, using transcriptome sequencing approaches to characterize the impact of DNA sequence variants on human gene function, and using genomic approaches to discover disease-causing mutations in severe disease patients.</p>
+    <p class="leadText">The <a href="http://www.macarthurlab.org/home/">MacArthur Lab</a> focuses on extracting useful information from massive datasets generated from large-scale next-generation sequencing projects. Some of the main focuses of the lab are accurate identification of sequence variants from massive data-sets, annotation of loss of function (LoF) variants, using transcriptome sequencing approaches to characterize the impact of DNA sequence variants on human gene function, and using genomic approaches to discover disease-causing mutations in severe disease patients.</p>
 
-    <a id="project2" class="anchor"></a>
+    <a id="exac-mnp" class="anchor"></a>
     <div class="project">
-        <h4 class="projectTitle"><div class="expandIcon">-</div>Gene Models and Annotation Tools</h4>
+        <h4 class="projectTitle"><div class="expandIcon">-</div>Multi-Nucleotide Polymorphisms in ExAC Dataset</h4>
         <div class="projectBody">
-			<p>I will soon lead a project comparing the consequences of using different gene models and tools for annotation of variants from whole exome and whole genome sequencing projects.</p>
-			<p>The scope of this work will initially include GENCODE and RefSeq gene models, Variant Effect Predictor, ANNOVAR, and SnpEff annotation tools, and known mutations from HGMD.</p>
-			<p>I will also be investigating how to best summarize and consolidate information and annotation from multiple transcripts in GENCODE.</p>
+            <p>Our lab is preparing to release a large dataset on behalf of the Exome Aggregation Consortium (ExAC) derived from nearly 100K exome sequences. This will be the largest exome sequencing reference panel to date and has a wide variety of applications.</p>
+
+            <p>As a small part of this massive collaborative effort, I am contributing an analysis of multi-nucleotide polymorphisms (MNPs) present in samples from the project. Specifically, I am investigating combinations of two or three single-nucleotide polymorphisms (SNPs) that when found in the same haplotype in a given sample change the interpretation of LoF variants. For example, we have found MNPs that result in LoF variants that would otherwise go undetected when annotating the SNPs separately. Conversely, we have also found combinations of SNPs that result in rescue of LoF variants.</p>
+
+            <p>An analysis of the MNPs found through this analysis will be part of the final publication and will also be detailed in a blog post via my blog once complete.</p>
+        </div>
+    </div>
+
+    <a id="exon-conservation" class="anchor"></a>
+    <div class="project">
+        <h4 class="projectTitle"><div class="expandIcon">-</div>Finding Misannotated Exons in GENCODE V19</h4>
+        <div class="projectBody">
+            <p>The goal of this project was to find exons that are incorrectly annoatated as protein-coding, when they may not actually be, as well as exons that may not be annotated with the correct reading frame in the <a href="http://www.gencodegenes.org/releases/19.html">GENCODE V19</a> gene model.</p>
+
+            <p>Using a combination of <a href="https://github.com/mlin/PhyloCSF/wiki">PhyloCSF</a> (evolutionary conservation metrics in 29 mammals phylogeny), constraint scores based on depletion of certain types of variation beyond genome-wide expectation in a large reference population, as well as RPKM tissue expression values from the <a href="http://www.gtexportal.org/home/">GTEx Project</a>, we have identified a subset of GENCODE exons that may not be protein coding and require further investigation.</p>
+
+            <p>We have also developed a simple approach using PhyloCSF to find exons that are likely annotated with the incorrect reading frame and require further investigation.</p>
+
+            <p>Collectively, these two sources of misannotation impact the way we interpret potential LoF variants during annotation. Our lab is seeking to integrate these metrics into our VEP plugin for LoF annotation -- <a href="https://github.com/konradjk/loftee">LOFTEE.</a> Results from this project will be incorporated into the LOFTEE publication and detailed in a blog post (coming soon!).</p>
         </div>
     </div>
 
@@ -22,9 +38,11 @@ layout: default
     <div class="project">
         <h4 class="projectTitle"><div class="expandIcon">-</div>Leiden Muscular Dystrophy Variant Database</h4>
         <div class="projectBody">
-            <p>I developed Python scripts to automate extraction and remapping of variants from any Leiden Open Variation Database installation. These databases contain potentially invaluable information for human disease research, but are fraught with inconsistencies and in unusable formats for large-scale data analytics.</p>
-			<p>I remapped variants to genomic coordinates, performed extensive validation, and augmented existing information with data from HGMD and allele frequencies from various ethnic populations.</p>
-			<p>In the next steps of this project, our group will be working closely with our unit leader Professor Mark Daly to provide data for his work in human disease research.</p>
+            <p>I developed a python API and lightweight scripts to automate extraction and remapping of variants from any Leiden Open Variation Database installation. These databases contain potentially invaluable information for human disease research, but are fraught with inconsistencies and in unusable formats for large-scale data analytics.</p>
+
+            <p>Technical aspects of this project involved screen-scraping using BeautifulSoup (while managing several LOVD versions with heterogeneous markup), remapping HGVS cDNA variant coordinates to VCF-format genomic coordinates, dealing with highly varied data quality, annotation with variant effect predictor, cross-checking various data sources for QC, and annotating variants with various other data sources.</p>
+
+			<p>Extensive project documentation can be found on <a href="https://github.com/andrewhill157/leiden">ReadTheDocs</a>. The relevant scripts and python packages can be found on <a href="https://github.com/andrewhill157/leiden">GitHub</a>.
         </div>
     </div>
 </div>
