@@ -12,17 +12,23 @@ blockquote,
 	border-color: #39275B;
 }
 
-tr:nth-child(even) {
+tr:nth-child(even),
+.result_item:hover {
 	background-color: #f8f8f8;
 }
 
-table, td, th, input, pre {
+table, td, th, 
+input,
+.result_item, .result {
 	border-color: #dddddd;
 }
 
 input:focus, input::selection {
-	
 	box-shadow: 0px 0px 1px 1px #dddddd;
+}
+
+.result {
+	background-color: white;
 }
 
 .figure {

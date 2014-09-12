@@ -31,14 +31,38 @@ input {
     margin-top: 5px;
     border-radius: 5px;
     border: 1px solid;
-    width: 75%;
+    width: 250px;
     height: 30px;
     padding: 5px;
     outline-style: none;
 }
 
 .result {
-    margin-top: 5px;
+    margin-top: -1px;
+    position: absolute;
+    border: 1px solid;
+    width: 300px;
+}
+
+.result a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.result_item {
+    display: block;
+    border-bottom: 1px solid;
+    margin-top: -1px;
+    padding: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    white-space: nowrap;
+    overflow: auto;
+
+}
+
+.result_item:hover {
+    cursor: pointer;
 }
 
 .undecorated {

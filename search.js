@@ -31,20 +31,47 @@ $(document).ready(function() {
       search();
 
   });
+  
+  $("input").keydown(function(e) {
+  	  // Key behaviors -- currently just prevents defaults.
+  	  switch(e.which) {
+  	  	  
+  	      case 13:
+  	      e.preventDefault();
+  	      break;
+  	      
+  	  	  case 38:
+  	  	  e.preventDefault();
+  	  	  break;
+  	  	  
+  	      case 40:
+  	      e.preventDefault();
+  	      break;
+  	      
+  	      default: return;
+  	  }
+      search();
+
+  });
 });
 
 function search() {
  
   var result = idx.search($("input").val());
   if(result && result.length > 0) {
+  
+  	var result_html = '<div class="result">'
   	for(var i in result) {
 
   		// Limit to top 10 results
   		if (i < 10) {
+  			
   			reference = result[i].ref
-  			$('<div class="result">↳ <a href="' + reference + '">' + indexed_docs[reference]['title'] + '</a></div>').insertAfter("input");
+  			result_html = result_html + '<a href="' + reference + '">' + '<div class="result_item">↳' + indexed_docs[reference]['title'] + '</div></a>'
   		}
   	}
+  	result_html = result_html + '</div>'
+  	$(result_html).insertAfter("input");
   	
     // window.location.replace(result[0].ref);
   }
