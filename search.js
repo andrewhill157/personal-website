@@ -51,8 +51,12 @@ $(document).ready(function() {
   	      default: return;
   	  }
       search();
-
   });
+  
+  $("input").focusin(function(e) {
+  	  search();
+  });
+  
 });
 
 function search() {
