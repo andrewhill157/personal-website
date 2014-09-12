@@ -19,7 +19,8 @@ tr:nth-child(even),
 
 table, td, th, 
 input,
-.result_item, .result {
+.result_item, .result,
+pre {
 	border-color: #dddddd;
 }
 
