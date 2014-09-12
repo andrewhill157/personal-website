@@ -27,6 +27,16 @@ blockquote {
 	font-style: italic;
 }
 
+table {
+	width: 100%;
+}
+
+table, td, th {
+	border: 1px solid;
+	padding: 5px;
+	overflow: auto;
+}
+
 .figure img {
 	width: 100%;
 }

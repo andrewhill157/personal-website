@@ -27,6 +27,20 @@ h1, h2, h3, h4, h5, h6 {
     text-align: left;
 } 
 
+input {
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid;
+    width: 75%;
+    height: 30px;
+    padding: 5px;
+    outline-style: none;
+}
+
+.result {
+    margin-top: 5px;
+}
+
 .undecorated {
     color: inherit;
 }
