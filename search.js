@@ -45,7 +45,10 @@ $(document).ready(function() {
   	      e.preventDefault();
   	      var selected_item = $(".selected_result");
   	      var url = selected_item.attr('href');
-  	      window.location.replace(url);
+
+  	      if (typeof url !== typeof undefined && url !== false) {
+  	          window.location.replace(url);
+  	      }
   	      
   	      break;
   	      
