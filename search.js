@@ -100,10 +100,10 @@ function search() {
   		}
   		
   		if (i == 0) {
-  			result_html = result_html + '<a class="result_item selected_result" href="' + reference + '">' + '<div>↳' + indexed_docs[reference]['title'] + '</div></a>'
+  			result_html = result_html + '<a class="result_item selected_result" href="' + reference + '">' + '<p>↳ ' + indexed_docs[reference]['title'] + '</p></a>'
   		} else {
   			
-  			result_html = result_html + '<a class="result_item" href="' + reference + '">' + '<div>↳' + indexed_docs[reference]['title'] + '</div></a>'
+  			result_html = result_html + '<a class="result_item" href="' + reference + '">' + '<p>↳ ' + indexed_docs[reference]['title'] + '</p></a>'
   		}
   	}
   	result_html = result_html + '</div>'

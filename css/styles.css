@@ -41,7 +41,7 @@ input {
     margin-top: -1px;
     position: absolute;
     border: 1px solid;
-    width: 300px;
+    width: 310px;
 }
 
 .result a {
@@ -53,12 +53,13 @@ input {
     display: block;
     border-bottom: 1px solid;
     margin-top: -1px;
-    padding: 5px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    white-space: nowrap;
-    overflow: auto;
+    padding: 10px;
+    padding-left: 28px;
+    text-indent: -20px;
+}
 
+.result_item p {
+    margin: 0;
 }
 
 .result_item:hover {
