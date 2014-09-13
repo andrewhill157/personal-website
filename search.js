@@ -2,7 +2,7 @@
 ---
 var docs = 
 [ 
-{% for post in site.posts limit:10 %}
+{% for post in site.posts %}
   {% include post.json %},
 {% endfor %}
 ];
@@ -32,30 +32,53 @@ $(document).ready(function() {
 
   });
   
+  $("body").on('mouseenter', '.result_item', function(e) {
+  	  $(".result_item").removeClass("selected_result");
+  	  $(this).addClass("selected_result");
+  });
+  
   $("input").keydown(function(e) {
   	  // Key behaviors -- currently just prevents defaults.
   	  switch(e.which) {
   	  	  
   	      case 13:
   	      e.preventDefault();
+  	      var selected_item = $(".selected_result");
+  	      var url = selected_item.attr('href');
+  	      window.location.replace(url);
+  	      
   	      break;
   	      
   	  	  case 38:
   	  	  e.preventDefault();
-  	  	  break;
+  	      var selected_item = $(".selected_result");
+  	      var next_result = selected_item.prev();
+  	      
+  	      if(next_result.length) {
+  	         $('.selected_result').removeClass('selected_result');
+  	         next_result.addClass('selected_result');
+  	      }
+  	      break;
   	  	  
   	      case 40:
   	      e.preventDefault();
-  	      break;
+  	      var selected_item = $(".selected_result");
+  	      var next_result = selected_item.next();
   	      
-  	      default: return;
+  	      if(next_result.length) {
+  	         $('.selected_result').removeClass('selected_result');
+  	         next_result.addClass('selected_result');
+  	      }
+  	      
+  	      break;
   	  }
-      search();
   });
   
   $("input").focusin(function(e) {
   	  search();
   });
+  
+
   
 });
 
@@ -66,16 +89,23 @@ function search() {
   
   	var result_html = '<div class="result">'
   	for(var i in result) {
-
+		reference = result[i].ref
+		
   		// Limit to top 10 results
-  		if (i < 10) {
+  		if (i >= 10) {
+  			break;
+  		}
+  		
+  		if (i == 0) {
+  			result_html = result_html + '<a class="result_item selected_result" href="' + reference + '">' + '<div>↳' + indexed_docs[reference]['title'] + '</div></a>'
+  		} else {
   			
-  			reference = result[i].ref
-  			result_html = result_html + '<a href="' + reference + '">' + '<div class="result_item">↳' + indexed_docs[reference]['title'] + '</div></a>'
+  			result_html = result_html + '<a class="result_item" href="' + reference + '">' + '<div>↳' + indexed_docs[reference]['title'] + '</div></a>'
   		}
   	}
   	result_html = result_html + '</div>'
   	$(result_html).insertAfter("input");
+  	
   	
     // window.location.replace(result[0].ref);
   }

@@ -13,7 +13,8 @@ blockquote,
 }
 
 tr:nth-child(even),
-.result_item:hover {
+.result_item:hover,
+.selected_result {
 	background-color: #f8f8f8;
 }
 
