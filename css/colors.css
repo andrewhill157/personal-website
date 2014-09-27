@@ -2,6 +2,7 @@
 Allows for easy color theme changes.
 */
 h1, h2, h3, h4, h5, h6,
+th,
 blockquote,
 #myName,
 #navigationLinks li {
@@ -12,9 +13,7 @@ blockquote,
 	border-color: #39275B;
 }
 
-tr:nth-child(even),
-.result_item:hover,
-.selected_result {
+tr:nth-child(even) {
 	background-color: #f8f8f8;
 }
 
@@ -37,11 +36,16 @@ input:focus, input::selection {
 	color: #717171;
 }
 
+.selected_result p {
+	color: white;
+}
+
 .downloadLink,
 .projectThumbnailBody p, .expandIcon,
 .smallIcon,
 .socialMediaLinks img,
-.tag {
+.tag, 
+.selected_result {
 	background-color: #39275B;
 }
 
