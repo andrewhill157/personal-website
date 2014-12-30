@@ -1,22 +1,13 @@
 <!-- Side bar with recent blog posts and other links -->
 <div class="sidebar">
-	<div class="minor well shadow">
 	<h3 class="sideBarLabel">Search Posts</h3>
 	<form>
-    <div class="input-append">
       <input class="search" type="search" name="search" id="search" placeholder="Search..."/>
-    </div>
     </form>
-</div>
-	<h3 class="sideBarLabel">Recent Posts</h3>
-	<ul>
-		{% for post in site.posts limit: 5 %}
-		<li><a href="{{ post.url }}">{{ post.title }}</a></li>
-		{% endfor %}
-	</ul>
-	<a href="/post_index/">See All Posts &#10148</a>
-	<h3 class="title sideBarLabel">My Social Media</h3>
+    <h3 class="sideBarLabel">Browse Posts</h3>
+    <div class="allposts">
+	<a class="undecorated" href="/post_index/"><span class="readmore">All Posts</span></a>
+	</div>
 
-	{% include socialMediaLinks.html %}
 </div>
 

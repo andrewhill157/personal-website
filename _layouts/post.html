@@ -8,10 +8,11 @@
 		 {% endif %}
 
 		 <h1>{{ page.title }}</h1>
-    	<h2 class="postDate">{{ page.date | date: " %B %-d, %Y" }} {% include sharePostButtons.html %}</h2>
+		<div class="postDate">
+		  <span class="month">{{ page.date | date: "%B" | truncate: 3,'' }}</span>
+		  <span class="day">{{ page.date | date: "%-d" }}</span>
+		</div>
 			{{ content }}
-			<h4>Share This Post:<h4>
-			{% include sharePostButtons.html %}
 
 			{% include disqusComments.html %}
 	</div>
