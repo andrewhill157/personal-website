@@ -78,7 +78,7 @@ p {
     text-align: left;
 }
 
-.container small {
+small {
     text-align: center;
     display: block;
 }
