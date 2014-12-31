@@ -117,7 +117,7 @@ nav span {
 
 #header {
     border-bottom: 1px solid;
-    height: 55px;
+    height: 48px;
 
     position: fixed;
     z-index: 1;
@@ -182,6 +182,7 @@ nav span {
 @media only screen and (max-width: 500px) {
     #header {
         position: static;
+	height: 35px;
     }
 
     #myName {
@@ -215,7 +216,9 @@ nav span {
 }
 
 @media (max-width: 425px) {
-
+    #header {
+        height: 62px;
+    }
     #myName {
         float: none;
         margin: 0 auto;
