@@ -30,6 +30,11 @@ a:hover {
     text-decoration: underline;
 }
 
+.fitwidth {
+    width: 100%;
+    margin: 10px;
+}
+
 /* Trick to get shift anchor links above target to account for fixed navigation bar */
 a.anchor {
     display: block;
@@ -426,6 +431,7 @@ PROJECT PAGES
 
 .projectThumbnailBody {
     position: relative;
+    height: 180px;
     overflow: hidden;
     box-shadow: 1px 1px 1px 1px #888888;
     transition: all .15s;
