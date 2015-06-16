@@ -16,6 +16,9 @@
         <!--Style sheet suggested for browser consistency-->
         <link href='/css/normalize.css' rel='stylesheet'>
 
+        <!--Responsive navigation bar includes-->
+        <link rel="stylesheet" href="/css/responsive-nav.css">
+
         <!--Google Web Fonts for pages-->
         <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,800,700,600' rel='stylesheet' type='text/css'>
 	
@@ -27,20 +30,18 @@
 </head>
 <body>
 
-        <!--Header and links to other sections-->
-        <nav id="header">
-                <div id="headerWrapper">
-                        <span id="myName">Andrew Hill</span>
-                        <span id="navigationLinks">
-                                <ul>
-                                        <a href="/"><li>About</li></a>
-                                        <a href="/blog"><li>Blog</li></a>
-                                        <a href="/projects"><li>Projects</li></a>
-                                        <a href="/cv"><li>CV</li></a>
-                                </ul>
-                        </span>
-                </div>
-        </nav>
+    <header>
+      <a href="/" class="logo undecorated">Andrew Hill</a>
+      <nav class="nav-collapse">
+        <ul>
+          <li class="menu-item"><a class="undecorated" href="/">About</a></li>
+          <li class="menu-item"><a class="undecorated" href="/blog">Blog</a></li>
+          <li class="menu-item"><a class="undecorated" href="/projects">Projects</a></li>
+          <li class="menu-item"><a class="undecorated" href="/cv">CV</a></li>
+        </ul>
+      </nav>
+    </header>
+
 
         <!--Outer div to house social media links and page content-->
         <div class="container">	
