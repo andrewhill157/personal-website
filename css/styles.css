@@ -14,10 +14,10 @@ body, .container {
 
 .section {
     padding: 20px 4% 20px 4%;
-    
+
     border-bottom: 1px solid #e1e1e1;
-    
-    text-align: justify;   
+
+    text-align: justify;
 }
 
 a {
@@ -62,7 +62,7 @@ p {
     display: block;
     -webkit-margin-before: 1em;
     -webkit-margin-after: 1em;
- 
+
 }
 
 .leadText {
@@ -87,7 +87,7 @@ small {
 }
 
 /*Different name and header format for smaller screens*/
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 700px) {
     p {
         text-align: left;
     }
@@ -154,7 +154,7 @@ BLOG FEED
     font-weight: 600;
 }
 
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 700px) {
     .postDate {
         position: static;
         display: block;
@@ -388,7 +388,7 @@ FRONT PAGE
 #headshot img {
     background-color: white;
     border-color: #e1e1e1;
-    
+
     display: block;
     height: auto;
     max-width: 400px;
@@ -504,7 +504,7 @@ PROJECT PAGES
     margin-right: 3px;
 }
 
-@media(min-width: 700px) {
+@media(min-width: 900px) {
 
 .projectThumbnailBody:hover > p{
     height: 90px;
