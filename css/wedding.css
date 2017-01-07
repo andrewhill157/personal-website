@@ -26,6 +26,7 @@ iframe {
   border-radius: 50%;
   padding: 10px;
   border: 1px solid #A6AAA9;
+  background-color: white;
   display: block;
   margin: auto;
   -webkit-transition-duration: 0.2s; /* Safari */
@@ -55,4 +56,21 @@ iframe {
 
 header {
   background: #7D42B7;
+}
+
+.engagement-photos li, .engagement-photo >li > img {
+  display: inline-block;
+}
+
+.engagement-photos > li > img {
+  height: 150px;
+  padding: 5px;
+  background-color: white;
+  border: 1px solid #A6AAA9;
+  -webkit-transition-duration: 0.2s; /* Safari */
+  transition-duration: 0.2s;
+}
+
+.engagement-photos > li > img:hover {
+  transform: scale(1.8);
 }
