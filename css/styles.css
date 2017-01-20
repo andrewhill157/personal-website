@@ -5,7 +5,7 @@ BASE FORMATTING
 /*Background image for web page*/
 body {
     font-family: 'Open Sans', sans-serif;
-    color: #333;
+    color: #535961;
 }
 
 body, .container {
@@ -319,7 +319,7 @@ SIDEBAR
 }
 
 .readmore:hover {
-    background-color: #1a8cff;
+    background-color: #006aff;
 }
 
 /*********************************************************************************
@@ -420,7 +420,7 @@ div.smallIcon {
 PROJECT PAGES
 *********************************************************************************/
 .background {
-    border-color: #333;
+    border-color: #535961;
 }
 
 .projectThumbnailBody {
@@ -478,10 +478,27 @@ PROJECT PAGES
     cursor: pointer;
 }
 
-.downloadLink,
 .projectThumbnailBody p, .expandIcon,
 .smallIcon {
     background-color: #333;
+}
+
+span.downloadLink {
+    background-color: #007fff;
+    border: 2px solid #007fff;
+    border-radius: 5px;
+    color: #fff;
+    padding: 10px;
+    cursor: pointer;
+    box-shadow: 0 2px 1px rgba(0,0,0,0.125);
+}
+
+span.downloadLink:hover {
+    background-color: #006aff;
+}
+
+.downloadLink a:hover {
+    text-decoration: none;
 }
 
 .projectBody {
@@ -519,7 +536,6 @@ PROJECT PAGES
     }
 }
 
-.downloadLink,
 .expandIcon {
     color: white;
 }
@@ -529,18 +545,10 @@ PROJECT PAGES
     margin-bottom: 10px;
 }
 
-.downloadLink a:hover {
-    -moz-transform: scale(1.02);
-    -webkit-transform: scale(1.02);
-    -o-transform: scale(1.02);
-    transform: scale(1.02);
-    text-decoration: none;
-}
-
 .downloadLink a {
     font-size: 15px;
-    padding: 10px;
-    font-weight: 400;
+    font-weight: 600;
+    color: #fff;
 }
 
 

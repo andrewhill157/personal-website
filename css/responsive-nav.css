@@ -48,6 +48,9 @@ a:hover {
 .nav-collapse li {
   width: 100%;
   display: block;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 30px;
 }
 
 .js .nav-collapse {
@@ -126,7 +129,9 @@ p {
 
 header {
   background: #007fff;
-  color: white;
+  background: #fff;
+  color: #777;
+  box-shadow: 0 1px 2px 1px rgba(179,179,179, .6);
   position: fixed;
   z-index: 3;
   width: 100%;
@@ -139,10 +144,11 @@ header {
   text-decoration: none;
   font-weight: bold;
   font-size: 30px;
-  line-height: 55px;
+  line-height: 60px;
   padding: 0 20px;
   color: #fff;
   float: left;
+  margin-top: 2px;
 }
 
 
@@ -228,37 +234,37 @@ header {
 
 .nav-collapse a {
   -webkit-tap-highlight-color: rgba(0,0,0,0);
-  border-top: 1px solid white;
+  border-top: 1px solid rgb(179, 179, 179, 0.6);
   text-decoration: none;
-  background: #007fff;
+  background: #fff;
   padding: 0.7em 1em;
-  color: #fff;
+  color: #777;
   width: 100%;
   float: left;
 }
 
 .nav-collapse a:active,
 .nav-collapse .active a {
-  background: #007fff;
+  background: #fff;
 }
 
 @media screen and (min-width: 60em) {
   .nav-collapse a {
-
     padding: 1.02em 2em;
     text-align: center;
-    border-top: 0;
     float: left;
     margin: 0;
+    border-bottom: 2px solid #fff;
+    margin-top: 2px;
   }
 
   .nav-collapse a:hover {
-    background: #198bff;
+    border-bottom: 2px solid #007fff;
   }
 }
 
 .nav-collapse ul ul a {
-  background: #007fff;
+  background: #fff;
   padding-left: 2em;
 }
 
@@ -297,7 +303,7 @@ header {
 }
 
 .nav-toggle:before {
-  color: #fff; /* Edit this to change the icon color */
+  color: #777; /* Edit this to change the icon color */
   font: normal 28px/55px "responsivenav"; /* Edit font-size (28px) to change the icon size */
   text-transform: none;
   text-align: center;
@@ -308,9 +314,10 @@ header {
   width: 100%;
   left: 0;
   top: 0;
+  margin-top: 2px;
 }
 
 .nav-toggle.active:before {
-  font-size: 24px;
-  content: "\78"; /* Close icon */
+  font-size: 20px;
+  content: "\2715"; /* Close icon */
 }

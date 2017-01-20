@@ -47,11 +47,17 @@ iframe {
 
 .nav-collapse a {
   background: #7D42B7;
-  font-weight: 400;
+  font-weight: 600;
+  color: #fff;
+  border-bottom: 2px solid #7D42B7;
 }
 
 .nav-collapse a:hover {
-  background: #A158EA;
+  border-bottom: 2px solid #fff;
+}
+
+.nav-toggle:before {
+  color: #fff;
 }
 
 header {
