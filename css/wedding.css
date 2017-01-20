@@ -45,6 +45,11 @@ iframe {
     color: #7D42B7;
 }
 
+.logo {
+  font-size: 25px;
+  line-height: 60px;
+}
+
 .nav-collapse a {
   background: #7D42B7;
   font-weight: 600;
@@ -79,4 +84,15 @@ header {
 
 .engagement-photos > li > img:hover {
   transform: scale(1.8);
+}
+
+.container {
+    max-width: 1000px;
+    margin: 55px auto 20px;
+    text-align: left;
+}
+
+.rsvp-form {
+  max-height: 1300px;
+  height: 1300px;
 }
