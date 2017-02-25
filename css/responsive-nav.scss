@@ -178,7 +178,6 @@ header {
         a {
           color: inherit;
           width: 100%;
-          float: left;
 
           @media screen and (max-width: 60em) { padding: 0.7em 1em; }
 
@@ -212,7 +211,7 @@ header {
   text-indent: -300px;
   position: relative;
   overflow: hidden;
-  width: 60px;
+  width: 40px;
   height: 55px;
   float: right;
   color: inherit;

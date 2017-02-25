@@ -34,13 +34,41 @@ header {
   border: 1px solid #A6AAA9;
   background-color: white;
   display: block;
-  margin: auto;
   -webkit-transition-duration: 0.2s; /* Safari */
   transition-duration: 0.2s;
 }
 
-#couple-image1,#couple-image3 {
-  margin-top: 20px;
+.column-container {
+    display: flex;
+    flex-flow: row wrap;
+    width: 100%;
+    justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+    -webkit-flex-flow: row wrap;
+    -webkit-justify-content: space-between;
+    
+    .column {
+        -webkit-flex: 1 1 auto;
+        flex: 1 1 auto;
+        display: flex;
+        justify-content: center; /* align horizontal */
+        align-items: center; /* align vertical */
+    }
+
+    .column-1 {
+        @extend .column;
+        order: 1;
+    }
+
+    .column-2 {
+        @extend .column;
+        order: 2;
+    }
+
+    .column-3 {
+        @extend .column;
+        order: 3;
+    }
 }
 
 #couple-image1:hover,#couple-image2:hover,#couple-image3:hover {
@@ -100,5 +128,5 @@ header {
 
 .rsvp-form {
   max-height: 1400px;
-  height: 1400px;
+  height: 1500px;
 }
