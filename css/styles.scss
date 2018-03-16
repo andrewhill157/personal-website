@@ -442,17 +442,31 @@ div.projectThumbnailBody {
     }
 }
 
+img.projectIcon {
+        height: 30px;
+        width: 30px;
+        display: inline;
+        background-color: $dark_background_color;
+        opacity: .90;
+}
+
+img.projectIcon:hover {
+        transform: scale(1.05);
+        -moz-transform: scale(1.05);
+        -webkit-transform: scale(1.05);
+        -o-transform: scale(1.05);
+}
+
 div.publicationThumbnailBody {
     position: relative;
     overflow: hidden;
-    height: 360px; 
+    height: 400px; 
     box-shadow: 1px 1px 1px 1px $shadow;
 
     img {
         position: relative;
         overflow: hidden;
         width: 100%;
-        background-color: white;
     }
 
     p {
