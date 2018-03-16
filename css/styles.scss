@@ -442,6 +442,51 @@ div.projectThumbnailBody {
     }
 }
 
+div.publicationThumbnailBody {
+    position: relative;
+    overflow: hidden;
+    height: 360px; 
+    box-shadow: 1px 1px 1px 1px $shadow;
+
+    img {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        background-color: white;
+    }
+
+    p {
+        color: white;
+        background-color: $dark_background_color;
+        opacity: .90;
+        padding: 10px;
+        line-height: 28px;
+        text-align: left;
+        position: absolute;
+        bottom: 0;
+        margin: 0;
+        height: 28px;
+        width: 95%;
+        font-weight: 600;
+        transition: all .15s;
+        -webkit-transition: all .15s;
+        -moz-transition: all .15s;
+
+        small {
+            opacity: 0;
+            height: 30px;
+            text-align: left;
+        }
+    }
+
+    &:hover {
+        p { height: 180px; }
+        small { opacity: 1; }
+    }
+}
+
+
+
 .projectTitle {
     font-size: 20px;
     &:hover { cursor: pointer; }
