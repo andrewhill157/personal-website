@@ -1,24 +1,26 @@
-{% include header.html %}
-<div class="partition group">
-	<div class="col span_2_of_3">
-		<div class="section post">
-			
-		 {% if page.thumbnail %}
-		 <img class="thumbnail" src={{page.thumbnail}}>
-		 {% endif %}
+{% include header_base.html %}
+<div class="container">
+	<div class="partition group">
+		<div class="col span_2_of_3">
+			<div class="section post">
 
-		 <h1>{{ page.title }}</h1>
-		<div class="postDate">
-		  <span class="month">{{ page.date | date: "%B" | truncate: 3,'' }}</span>
-		  <span class="day">{{ page.date | date: "%-d" }}</span>
+			 {% if page.thumbnail %}
+			 <img class="thumbnail" src={{page.thumbnail}}>
+			 {% endif %}
+
+			 <h1>{{ page.title }}</h1>
+			<div class="postDate">
+			  <span class="month">{{ page.date | date: "%B" | truncate: 3,'' }}</span>
+			  <span class="day">{{ page.date | date: "%-d" }}</span>
+			</div>
+				{{ content }}
+
+				{% include disqusComments.html %}
 		</div>
-			{{ content }}
-
-			{% include disqusComments.html %}
 	</div>
-</div>
-	<div class="col span_1_of_3">
-		{% include sidebar.html %}
+		<div class="col span_1_of_3">
+			{% include sidebar.html %}
+		</div>
 	</div>
 </div>
 {% include footer.html %}
