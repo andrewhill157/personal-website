@@ -3,10 +3,10 @@ title: (DRAFT FOR REVIEW) Dimensionality Reduction for scATAC Data
 layout: post
 tags: analysis scATAC
 ---
-There have been many efforts to improve dimensionality reduction methods for scATAC data, particularly considering that it is a relatively underexplored datatype when compared to scRNA-seq. With the many different potential options, it can be somewhat confusing to follow the differences and pros/cons behind each method. The purpose of this post is to:
-1. Highlight the major classes of methods
+There have been many different efforts to improve dimensionality reduction methods for scATAC data, particularly considering that it is a relatively underexplored datatype when compared to scRNA-seq. With many different options, it can be somewhat confusing to follow the differences and pros/cons behind each method. The purpose of this post is to:
+1. Highlight the major classes of methods that exist currently
 2. Show examples of their performance on real-world data
-3. Point out a very simple modification of LSI/LSA that we find works much better than the version most groups use in benchmarking
+3. Point out a very simple modification of LSI/LSA that we find works much better than the version of LSI/LSA most groups use in benchmarking
 4. Discuss the tradeoffs between sample-specific features and sample-agnostic features
 
 I've also provided an R markdown file that enables reproduction of all the analyses here (including data downloads), which I hope is useful for exploring the methods discussed in this post:
@@ -14,47 +14,51 @@ I've also provided an R markdown file that enables reproduction of all the analy
 <span class="downloadLink"><a class="downloadLink" href="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/analysis.html">R Markdown (HTML)</a></span>
 
 ## Review of methods
-At least in my view, there are two main classes of methods that exist currently, although each class is made up of different potential approaches.
+At least in my view, there are two main classes of methods that exist currently, although each class is made up of several different potential approaches.
 
 ### Dimensionality through scoring of metafeatures
-I believe the first method developed that fell into this category was [chromVar](https://www.nature.com/articles/nmeth.4401). The idea is that you can choose a set of features such as peak sets, kmers, motif hits, etc. and use a normalized/scaled version of the feature by cell count matrix as a reduced dimension representation of the dataset. This representation can then be used as input to t-SNE/UMAP. These representations can also be interpreted directly as enrichments of motifs in many (but not all) cases, which can be useful independent of dimensionality reduction.
+The idea is that you can choose a set of features such as overlap with existing peak sets (say different ChIP peaks), k-mers, motif hits, etc. and use a normalized/scaled version of the feature by cell count matrix as a reduced dimension representation of the dataset. This representation can then be used as input to t-SNE/UMAP. These representations can also be interpreted directly as enrichments of motifs in many (but not all) cases, which can be useful independent of dimensionality reduction.
 
-Other methods that fall into this category include [BROCKMAN](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-018-2255-6) and [SCRAT](https://academic.oup.com/bioinformatics/article/33/18/2930/3823309). [Lareau, Duarte, Chew, et al.](https://www.biorxiv.org/content/10.1101/612713v1) also recently applied similar methods in their study.
+I believe the first method developed that fell into this category was [chromVar](https://www.nature.com/articles/nmeth.4401). Other methods that fall into this category include [BROCKMAN](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-018-2255-6) and [SCRAT](https://academic.oup.com/bioinformatics/article/33/18/2930/3823309). [Lareau, Duarte, Chew, et al.](https://www.biorxiv.org/content/10.1101/612713v1) also recently applied similar methods in their study (k-mer count deviations).
 
 ### Dimensionality reduction via genomic features
-One of the challenges of scATAC-seq data is that the choice of features is not nearly as obvious as the choice in scRNA-seq data (genes). Much of the useful information contained in scATAC-seq data isn't overlapping or easy to associate with specific genes. In our experience using genes as features in dimensionality reduction via a few different methods tends to result in substantial loss of resolution in dimensionality reduction.
+One of the challenges of scATAC-seq data is that the choice of features is not nearly as obvious as the choice in scRNA-seq data (genes). Much of the useful information contained in scATAC-seq data isn't overlapping or easy to meaningfully associate with specific genes. In our experience using genes-level scores as features in dimensionality reduction tends to result in substantial loss of resolution. We have tried gene body coverage, sums around genes (with or without peaks to constrain and with or without an exponential decay with distance), and methods that weight peaks according to their partial correlation with promoters (a version of activity scores as described in [Cusanovich, Hill, et al. (Cell 2018)](https://www.cell.com/cell/fulltext/S0092-8674(18)30855-9)).
 
-A number of different types of "features" have been used:
+A number of different types of "features" have been by used by us and others with much more success than gene-level scores (at least in our hands):
 1. Coverage within windows of the genome (generally 5kb in width)
 2. Coverage within peaks (either derived from bulk data or merged peaks from across clustered subsets of the data)
-3. Extended fragment overlaps
+3. Extended fragment overlaps used directly as a means for arriving at a distance metric (more on this later).
 
-1 and 2 leave you with what is effectively a binary (due to sparse sampling of the genome) window/peak by cell matrix. Pretty much all methods that I am aware of then attempt to transform this matrix in some way prior to doing a first round of linear dimensionality reduction, usually via a fast matrix factorization approach like SVD to do PCA, which can then be used as input to clustering/further dimensionality reduction, etc. However, there are several ways that different groups have gone about this, all of which are geared towards the binary nature of the data.
+1 and 2 leave you with what is effectively a binary (due to sparse sampling of the genome) window/peak by cell matrix. Pretty much all methods that I am aware of then attempt to transform this matrix in some way prior to doing a first round of linear dimensionality reduction, usually via a fast matrix factorization approach like SVD, which can then be used as input to clustering/further dimensionality reduction, etc. However, there are several ways that different groups have gone about this, all of which are geared towards the binary nature of the data.
+
+In 3, no windows are used explicitly, rather, fragments are extended to a given length and then overlaps of fragments between cells are used to calculate distance metrics directly for input into dimensionality reduction.
 
 #### LSI/LSA
-LSI/LSA or Latent Semantic Indexing/Analysis is a very simple approach borrowed from the topic modeling field. The idea is that in a binarized window/peak by cell matrix, you can do a transformation called term-frequency inverse-document-frequency (TF-IDF) to provide some depth normalization and upweight windows/peaks that appear less frequently in the population (the reasoning being that these are more likely to be informative). Generally, you would impose some minnimum threshold for the rate of detection of a window/peak in a population to avoid introducing noise. This transformed matrix can then be fed directly into SVD to do PCA.
+LSI/LSA or Latent Semantic Indexing/Analysis (two existing terms used to refer to the same techique) is a very simple approach borrowed from the topic modeling field. The idea is that in a binarized window or peak by cell matrix, you can do a transformation called term-frequency inverse-document-frequency (TF-IDF) to provide some depth normalization and up-weight windows/peaks that appear less frequently in the population (the reasoning being that these are more likely to be informative). Generally, you would impose some minnimum threshold for the rate of detection of a window/peak in a population to avoid amplifying noise. This transformed matrix can then be fed directly into SVD to do PCA.
 
-As I will discuss later, there are several different ways out there to perform TF-IDF and the choice of method has a substantial impact on performance, particularly for sparser datasets.
+As I will discuss later, there are several different ways out there to perform TF-IDF and the particular choice of method has a substantial impact on performance, particularly for sparser datasets.
+
+To my knowledge, [Cusanovich, et al. (Science 2015)](https://science.sciencemag.org/content/348/6237/910) was the first study to use LSI/LSA on scATAC data (although the technique has been established for quite some time and applied in many other fields). Several other papers such as [Cusanovich, Reddington, Garfield, et al. (Nature 2018)](https://www.nature.com/articles/nature25981), [Cusanovich, Hill, et al. (Cell 2018)](https://www.cell.com/cell/fulltext/S0092-8674(18)30855-9), [Chen, et al. (Nature Communications 2018)](https://www.nature.com/articles/s41467-018-07771-0), [Satpathy, Granga, et al. (bioRxiv 2019)](https://www.biorxiv.org/content/biorxiv/early/2019/04/18/610550.full.pdf), and the [10X genomics cellranger ATAC pipeline](https://support.10xgenomics.com/single-cell-atac/software/pipelines/latest/algorithms/overview) (implements both LSI/LSA and PLSI). Note that this list may not be comprehensive.
+
+Since LSI/LSA can be used on either windows or peaks, the specific uses in the literature mentioned above may vary with respect this choice (we have used both windows and peaks in different contexts for past publications).
 
 #### LDA/PLSI
-Latent Dirichlet Allocation (LDA) and probabalistic LSI/LSA (PLSI/PLSA) are two other approaches borrowed from the topic modeling field. 
+Latent Dirichlet Allocation (LDA) and probabalistic LSI/LSA (PLSI/PLSA) are two other approaches borrowed from the topic modeling field. These techniques assume that there exist some underlying number of topics (if you were looking at news articles, these might be politics, technology, etc., but we are looking at cells so these will represent contributions from a number of different peaks across the genome) and that each observation (news articles, or cells in our case) belongs to each topic with a given weight/probability. The goal is then to establish a probabalistic model that can help us find the underlying topics and assign each cell a probability of belonging to each of those topics.
 
-PLSI is a probabilitic version of LSI that can be approached from either an expectation maximization (EM) approach or a non-negative matrix factorization (NNMF) approach. Rather than doing TF-IDF followed by SVD/PCA, you use EM or NNMF to find matrices that correspond to `P(topic | document)` and `P(word | topic)`. You would pick the number of topics in advance (much like one would pick a number of principal components). More details can be found in a number of places, including [towards data science](https://towardsdatascience.com/topic-modelling-with-plsa-728b92043f41). One of the potential benefits of PLSI/PLSA is that both matrices are very readily interpretable as probabilities, which is not quite so much the case in LSI/LSA (although the loadings from PCA can used to aid in interpretation).
+PLSI is a probabilitic version of LSI that can be solved using either an expectation maximization (EM) approach or a non-negative matrix factorization (NNMF) approach. Rather than doing TF-IDF followed by SVD/PCA, you use EM or NNMF to find matrices that correspond to `P(topic | document)` and `P(word | topic)` (or `P(topic | cell)` and `P(peak | topic)` in the context of scATAC-seq data) distributions. You would pick the number of topics in advance (much like one would pick a number of principal components). More details can be found in a number of places, including [towards data science](https://towardsdatascience.com/topic-modelling-with-plsa-728b92043f41). One of the potential benefits of PLSI/PLSA is that both matrices are very readily interpretable as probabilities, which is not quite so much the case in LSI/LSA (although the loadings from PCA can used to aid in interpretation).
 
-LDA has a very similar goal to PLSI, but rather than using EM or NNMF, it places a direchlet priors over the `P(topic | document)` and `P(word | topic)` distributions and uses a Bayesian approach (usually some variant of Gibbs sampling) to solving the problem.
+LDA has a very similar goal to PLSI, but rather than using EM or NNMF, it places a Dirichlet priors over the `P(topic | document)` and `P(word | topic)` distributions and uses a Bayesian approach (usually some variant of Gibbs sampling) to solve the problem.
 
-In the end, `P(topic | document)` or in the case of scATAC `P(topic | cell)` matrix is a cell by topic matrix of probabilities which can then be used as a reduced dimension space. In practice this can then be used as something equivalent to the PCA space obtained from LSI/LSA. PLSI/PLSA and LDA are each much slower than LSI/LSA (LDA more so than PLSI), but are generally thought to be more accurate. More on these points later.
+In the end, the `P(topic | cell)` matrix is a cell by topic matrix of probabilities which can then be used as a reduced dimension space. In practice this can then be used as something equivalent to the PCA space obtained from LSI/LSA. PLSI/PLSA and LDA are each much slower than LSI/LSA (LDA more so than PLSI), but are generally thought to be more accurate.
 
-To my knowledge, [Cusanovich, et al. (Science 2015)](https://science.sciencemag.org/content/348/6237/910) was the first to use LSI/LSA on scATAC data (although the technique has been established for quite some time and applied in many other fields). Several other papers such as [Cusanovich, Reddington, Garfield, et al. (Nature 2018)](https://www.nature.com/articles/nature25981), [Cusanovich, Hill, et al. (Cell 2018)](https://www.cell.com/cell/fulltext/S0092-8674(18)30855-9), [Chen, et al. (Nature Communications 2018)](https://www.nature.com/articles/s41467-018-07771-0), [Satpathy, Granga, et al. (bioRxiv 2019)](https://www.biorxiv.org/content/biorxiv/early/2019/04/18/610550.full.pdf), and the [10X genomics cellranger ATAC pipeline](https://support.10xgenomics.com/single-cell-atac/software/pipelines/latest/algorithms/overview) (implements LSI/LSA and PLSI). Note that this list may not be comprehensive.
+LDA is used in a tool called [cisTopic](http://github.com/aertslab/cistopic) described in [González-Blas, Minnoye, et al. (Nature Methods 2019)](https://www.nature.com/articles/s41592-019-0367-1). PLSI/PLSA is available via the cellranger-atac pipeline as mentioned above, although I have not used it.
 
-LDA is used in a tool called [cisTopic](http://github.com/aertslab/cistopic) described in [González-Blas, Minnoye, et al. (Nature Methods 2019)](https://www.nature.com/articles/s41592-019-0367-1).
-
-Since LSI/LSA can be used on either windows or peaks, the specific uses in the literature mentioned above may vary with respect this choice (we have used both windows and peaks in different contexts for past publications). In our experience, LDA is slow enough that one would likely only want to apply it to peaks in practice (since they are less numerous), although in principle one could apply LDA to a window by cell matrix.
+In our experience, LDA is slow enough that one would likely only want to apply it to peaks in practice (since they are less numerous), although in principle one could apply LDA to a window by cell matrix.
 
 #### Jaccard distances
-Another alternative to LSI/LSA and LDA is to compute the Jaccard index (a metric meant for binary data) as a measure of similarity and use the pairwise Jaccard index matrix as input into PCA (this would be, I believe, equivalent to classical multi-dimensional scaling although typically this would only be a euclidean distance matrix). There are two main flavors of Jaccard-based approaches with which I am familiar:
+Another alternative to LSI/LSA and LDA is to compute the Jaccard index (a metric meant for binary data) as a measure of similarity and use the pairwise Jaccard index matrix as input into PCA (this would be, I believe, equivalent to classical multi-dimensional scaling although typically this would yse a euclidean distance matrix). There are two main flavors of Jaccard-based approaches with which I am familiar:
 1. Compute pairwise jaccard index (similarity) based on window by cell matrix, performing post-hoc normalization to account for this metric being highly sensitive to differences in total reads per cell.
-2. Extending all fragments to a larger length (say 1kb) and computing Jaccard indices directly based on extended fragment overlaps. One could argue that this is technically not based on "features", but I found it similar enough to the above that I've included it here. One could use post-hoc normalization on the pairwise Jaccard index matrix or downsample cells to equal depth beforehand.
+2. Extending all fragments to a larger length (say 1kb) and computing Jaccard indices directly based on extended fragment overlaps. One could argue that this is technically not based on "features", but I found it similar enough to the above that I've included it here. Post-hoc normalization could be performed or cells could be downsampled to equal depth beforehand.
 
 1 has been implemented in a recent pair of tools called [SnapATAC/SnapTools](https://github.com/r3fang/SnapTools), described in [Fang, et al. (bioRxiv 2019)](https://www.biorxiv.org/content/biorxiv/early/2019/04/22/615179.full.pdf). I'll also comment on SnapTools/SnapATAC more later, as it is a really nice tool more generally! In this instance the authors use the normalized pairwise Jaccard index matrix as input to PCA. Bing Ren's group has had different flavors of this method in earlier work like [Preissl et al. (Nature Neuroscience 2018)](https://www.nature.com/articles/s41593-018-0079-3)
 
@@ -68,26 +72,26 @@ There are likely other approaches out there that I'm not aware of or ones that h
 ## Note on important modifications to LSI/LSA
 At this point, it is worth mentioning that since our group has used LSI/LSA extensively in the past, you should take my opinion here with a large grain of salt. For the comparisons below, I've done my best to try out other methods and use more than one dataset to give a relatively unbiased view.
 
-Since our last publication using scATAC-seq data ([Cusanovich, Hill, et al. [Cell 2018]](https://www.cell.com/cell/fulltext/S0092-8674(18)30855-9)), I had explored using [cisTopic](http://github.com/aertslab/cistopic) and found that it tended to work quite a bit better than our usual LSI/LSA method.
+Since our last publication using scATAC-seq data ([Cusanovich, Hill, et al. [Cell 2018]](https://www.cell.com/cell/fulltext/S0092-8674(18)30855-9)), I had explored using [cisTopic](http://github.com/aertslab/cistopic) and found that it tended to work quite a bit better than our usual LSI/LSA method in many but not all cases.
 
-We went on to notice even more substantial differences in sparser datasets that we have generated more recently and we were always a bit confused as to why LSI/LSA seemed to perform so poorly on sparse datasets. After some digging, we arrived at the conclusion that much of the difference might be attributable to the way in which we have typically computed the TF matrix in the TF-IDF step of LSI/LSA rather than much difference the matrix factorization procedures used in LSI/LSA and LDA per se.
+We went on to notice even more substantial differences in sparser datasets and we were always a bit confused as to why LSI/LSA seemed to perform so poorly on sparse datasets. After some digging, we arrived at the conclusion that much of the difference might be attributable to the way in which we and others have typically computed the TF matrix in the TF-IDF step of LSI/LSA rather than much difference the matrix factorization procedures used in LSI/LSA and LDA per se.
 
 The purposes of TF-IDF in this case are 1) some normalization of what would otherwise be a binary matrix and 2) prioritizing sites that are seen less frequently in the population of cells. Generally we (and many others) compute the TF matrix as (in R):
 ```
 tf = t(t(count_matrix) / Matrix::colSums(count_matrix))
 ```
 
-It turns out that in many scATAC datasets (particularly if you are not very careful about which sites you use as input as we were in our paper), this will end up having strong outliers and being exponentially distributed, due to the distribution of total sites in cells.
+It turns out that in many scATAC-seq datasets (particularly if you are not pretty careful about which cells and sites you use as input as we have typically been in our paper), this will end up having strong outliers and be exponentially distributed, due to the distribution of total sites in cells.
 
-We then compute the TF-IDF matrix using:
+We would then compute the TF-IDF matrix using:
 ```
 idf = log(1 + ncol(count_matrix) / Matrix::rowSums(count_matrix))
 tfidf = tf * idf
 ```
 
-The main issue, we think, is that the resulting matrix is being used as input into SVD/PCA without any further normalization or scaling. If you do have strong outliers, it is entirely expected that a method like PCA would tend not to work as well as something like LDA.
+The main issue, we think, is that the resulting matrix is being used as input into SVD/PCA without any further normalization or scaling. If you do have strong outliers in the TF matrix, it is entirely expected that a method like PCA would tend not to work as well as something like LDA.
 
-We reasoned that this could be fixed by simply log scaling entries of the tf matrix:
+We reasoned that this could be fixed by simply log scaling the entries of the tf matrix (worth noting that this is not something I have seen done in descriptions of LSI/LSA in the literature):
 ```
 tf = t(t(count_matrix) / Matrix::colSums(count_matrix))
 tf@x = log1p(tf@x * scale_factor)
@@ -96,19 +100,23 @@ tfidf = tf * idf
 ```
 
 To illustrate the effect that log scaling has, this is the distribution of entries in the tf matrix before and after log scaling:
-```
-TODO FIGURE
-```
+<img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/tf_matrix_log.png" alt="tf_matrix_log" width="100%">
 
-It is worth noting that the version of TF-IDF used in the 10x genomics cellranger pipeline, which is different from either discussed here, works pretty comparably to our proposed modification. While you might see some improvement switching between the two, they both perform well and broadly seem fairly similar.
+It is worth noting that the version of TF-IDF used in the 10x genomics cellranger pipeline, which is different from either discussed here (and also included for reference in the R markdown file linked above), works pretty much the same as our proposed modification (LSI logTF below). It uses the raw binary count matrix rather than dividing by the total reads per cell, which obviates the need for log scaling. It also uses a different definition of the IDF term. I don't compare them here, but want to make this clear because this wouldn't be obvious unless you had examined the cellranger-atac implementation.
 
 ### LSI vs. LSI logTF on data from mouse whole brain and PFC
-This change (or the version of TF-IDF used by 10x genomics) tends to improve results markedly. Here is a comparison of original flavor of LSI vs. the one with a log-scaled TF matrix on all whole brain and prefrontal cortex cells from Cusanovich, Hill, et al. [Cell 2018](https://www.cell.com/cell/fulltext/S0092-8674(18)30855-9) when simply imposing a lower bound on number of cells in which a site is measured as non-zero:
+This change tends to improve results markedly. Here is a comparison the original flavor of LSI vs. the one with a log-scaled TF matrix on all whole brain and prefrontal cortex cells from Cusanovich, Hill, et al. [Cell 2018](https://www.cell.com/cell/fulltext/S0092-8674(18)30855-9) when simply imposing a lower bound on number of cells in which a site is measured as non-zero as a means of feature selection:
 <img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/mouse.lsi_vs_lsilogtf.png" alt="mouse_lsi_vs_lsilogtf" width="100%">
 
-Note that in each case, I am feeding the reduced dimension space (PCA in this case) through a fairly standard workflow in [Seurat 3](https://satijalab.org/seurat/) for doing tSNE and Louvain clustering. I'll use this workflow on the initial PCA (or cell by topic matrix for cisTopic) throughout the post to make comparisons easier. The plot above also shows the results of each and then shows what each embedding looks like with cluster assignments swapped between the two techniques to illustrate similarity (or discordance), something I will also do throughout the rest of the post.
-
 Log scaling the TF matrix makes a big difference here and as you'll see later, this difference can be even more pronounced on sparser datasets. I'll refer to this flavor of LSI/LSA as LSI logTF for convenience.
+
+Note that in each case, I am feeding the reduced dimension space (PCA here) through a fairly standard workflow in [Seurat 3](https://satijalab.org/seurat/) for doing tSNE/UMAP and Louvain clustering. I'll use this workflow on the initial PCA (or cell by topic matrix for cisTopic) throughout the post to make comparisons easier. The plot above also shows the results of each and then shows what each embedding looks like with cluster assignments swapped between the two techniques to illustrate similarity (or discordance), something I will also do throughout the rest of the post.
+
+I'll admit that evaluating what is "better" or "the same" in each of these comparisons is a bit qualitative. When I make conclusions in this post it is based on the following:
+1. Clustering results at identical resolution in PCA (or topic) space having used the same cells and features as input in both methods.
+2. Qualitative assessment of large differences in the resulting embedding (in the context of cluster assignments often with high concordance across more than one method). I show tSNE here, but in the R markdown file, I also compute UMAP embeddings and these could be plotted instead.
+
+These are not perfect metrics, but given that I am largely arguing that LSI/LSA can improved substantially via a simple modification and I'm not trying to make any claims about subtle differences in performance between methods, I think they are sufficient here.
 
 ### Comparison to cisTopic
 Reassuringly, the results look very comparable to those generated by using cisTopic (with much shorter runtimes; minutes vs. several hours):
@@ -136,7 +144,7 @@ Each section follows all the same conventions as the above in terms of input to 
 <img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/tenx_mouse.lsi_vs_lsilogtf.png" alt="tenx_mouse_lsi_vs_lsilogtf" width="100%">
 
 ### Comparison to cisTopic
-TODO this is still running
+<img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/tenx_mouse.lsi_vs_cistopic.png" alt="tenx_mouse_lsi_vs_cistopic" width="100%">
 
 ### Comparison to Jaccard method
 <img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/tenx_mouse.lsilogtf_vs_snapatac.png" alt="tenx_mouse_lsilogtf_vs_snapatac" width="100%">
@@ -146,7 +154,7 @@ We have historically used peaks as features (although have applied LSI to 5kb wi
 
 However, one thing that scATAC-seq currently lacks relative to scRNA-seq is a common feature set across datasets. If all groups were to report matrices of counts in 5kb intervals (or some agreed-upon length), any two datasets could easily be combined. Peak matrices are inherently sample-specific which means that comparing two datasets would require having access to BAM files (or something similar) in order to generate matrices across common sets of features.
 
-Here I show that at least for the two datases mentioned above, when matching the cells used as input to the analysis, peaks and windows serve as equally useful features (which makes the case for using windows in my opinion, at least in this context).
+Here I show that at least for the two datases mentioned above, when matching the cells used as input to the analysis, peaks and windows serve as fairly comparable useful features. More comprehensive assessment would be required to say if either is better here in my view.
 
 ### Mouse whole brain and PFC
 <img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/mouse.peaks_vs_windows.png" alt="mouse_peaks_vs_windows" width="100%">
@@ -165,12 +173,20 @@ Here I chose only to focus on LSI logTF and SnapATAC on the 10x genomics adult m
 
 All plots are colored by the original LSI logTF cluster assignments using windows as features. Both SnapATAC and our logTF version of LSI seem to perform quite well at reduced depth. While the plots above look very consistent, there is a slight decrease in the number of clusters called by Seurat for all approaches with downsampling using a consistent resolution parameter (although using a higher resolution paramter would probably enable similar groupings, which is great).
 
-When examining clustering results on each dataset/method independently, logTF LSI has 16, 16, and 11 clusters called at this resolution with decreasing depth (8, 7, and 4 without log scaling). For SnapATAC the number of clusters called has 15, 15, and 13. Therefore, it seems like at least the last downsampling has some deterimental effect in this case for all techniques although I can't rule out the possibility that choosing a slightly different site-level filtering strategy might make a difference here.
+When examining clustering results on each dataset/method independently, logTF LSI has 16, 16, and 11 clusters called at this resolution with decreasing depth (8, 7, and 4 without log scaling). For SnapATAC the number of clusters called has 15, 15, and 13. Therefore, it seems like at least the last downsampling has some deterimental effect in this case for all techniques although I can't rule out the possibility that choosing a slightly different site-level filtering strategy might make a difference here or that the use of cluster counts here is not slightly misleading in some way (vs. some other more quantitative metric).
 
 At least at this first level of clustering, they seem to perform fairly equitably. It's possible that one of the two might perform better in an iterative context or other contexts in which there are less obvious differences between cells. In poking around so far, I haven't found a case where one clearly outperforms the other, but I plan to continue to compare the two on other datasets we're working with and would be very interested if someone does find good examples.
 
 ## Conclusions
-There are many possible ways in which to reduce the dimensionality of scATAC-seq data and hopefully this serves as a useful review and test of different methods as they stand currently. I've also shown that even within one class of method (LSI/LSA) simple differences in normalization procedures can make a big difference. Future papers should be careful to document the exact method used (e.g. the equations used for TF-IDF rather than just stating that LSI/LSA was used). My own personal opinion is that our slightly modified version of LSI/LSA, the Jaccard index based method in SnapATAC, and cisTopic all seem to work quite well even on very sparse datasets. LSI/LSI and SnapATAC have the advantage of being much faster, with cisTopic taking many hours to run on even fairly modestly sized datasets. However, as mentioned above LDA has the added benefit of better interpretability given it is probabalistic and cisTopic as a package also has many other nice features independent of dimensionality reduction. While more exploration should be done to assess performance of these different methods in different contexts, my experience with these methods has been very encouraging. Furthermore, the potential for using windows with LSI/LSA and SnapATAC, rather than peaks,as features opens up the possibility of common feature sets for scATAC-seq data (given that a particular convention became commonplace...).
+There are many possible ways in which to reduce the dimensionality of scATAC-seq data and hopefully this serves as a useful review and test of several different methods. I've also shown that even within one class of method (LSI/LSA) simple differences in normalization procedures can make a big difference. Future papers should be careful to document the exact method used (e.g. the equations used for TF-IDF rather than just stating that LSI/LSA was used). My own personal opinion is that our slightly modified version of LSI/LSA, the Jaccard index based method in SnapATAC, and cisTopic all seem to work quite well even on very sparse datasets. LSI/LSI and SnapATAC have the advantage of being much faster, with cisTopic taking many hours to run on even fairly modestly sized datasets (as also noted in [Fang, et al. (bioRxiv 2019)](https://www.biorxiv.org/content/biorxiv/early/2019/04/22/615179.full.pdf)). However, as mentioned above, LDA/PLSI/PLSA have the added benefit of better interpretability given it is probabalistic and cisTopic as a package also has many other nice features independent of dimensionality reduction. While others should explore for themselves to assess performance of these methods in different contexts, my experience so far has been very encouraging. Furthermore, the potential for using windows with LSI/LSA and SnapATAC, rather than peaks,as features opens up the possibility of common feature sets for scATAC-seq data within the same reference geneome, although I plan to do some more exploration in this area.
+
+I would be interested in hearing thoughts from others on this, but it seems like reporting some combination of the following could be quite useful for future studies using scATAC (or other similar measurements):
+- BAM files with cell IDs already at the start of the read name or [following the typical BAM tag conventions](https://support.10xgenomics.com/single-cell-atac/software/pipelines/latest/output/bam).
+- Something resembling the [10x genomics' fragments file](https://support.10xgenomics.com/single-cell-atac/software/pipelines/latest/output/fragments), which represents a more compact representation of relevant data from BAM files.
+- A 5kb window matrix as it could then easily be compressed to coarser window sizes if needed without going back to either of the above files.
 
 ## Note about SnapTools/SnapATAC
-Dimensionality reduction is just a very small portion of what SnapTools and SnapATAC accomplish. During the writing of this blog post I have gotten to explore both and think that they are both extremely useful tools and would encourage you to check them out. SnapTools allows for uniform processing of datasets from different technologies. SnapATAC leverages *.snap files generated by SnapTools to enable lots of extra utilities like wrappers for peak calling and motif enrichment, producing gene level scores, merging of datasets, extraction of reads for subsets of cells, etc. all from a single file. In principle, one could likely accomplish something similar using the [fragments file output by cellranger-atac with 10x genomics data](https://support.10xgenomics.com/single-cell-atac/software/pipelines/latest/output/fragments). This is something I have wanted badly for a long time and am extremely thankful that Rongxin Fang and colleagues have developed these tools and made them broadly available.
+Dimensionality reduction is just a very small portion of what SnapTools and SnapATAC accomplish. During the writing of this blog post I have gotten to explore both and think that they are both very useful tools and would encourage you to check them out. SnapTools allows for uniform processing of datasets from different technologies. SnapATAC leverages *.snap files generated by SnapTools to enable lots of extra utilities like wrappers for peak calling and motif enrichment, producing gene level scores, merging of datasets, extraction of reads for subsets of cells, etc. all from a single file. In principle, one could likely accomplish something similar using the [fragments file output by cellranger-atac with 10x genomics data](https://support.10xgenomics.com/single-cell-atac/software/pipelines/latest/output/fragments). This is something I have wanted badly for a long time and am very thankful that Rongxin Fang and colleagues have developed these tools and made them broadly available.
+
+## Note about this post
+I wanted to get some of this information out there as I think it is increasingly relevant and don't currently have the time to polish it up more to put together a bioRxiv post. If there is sufficient interest (e.g. desire to cite), I would consider taking the time to do so.
