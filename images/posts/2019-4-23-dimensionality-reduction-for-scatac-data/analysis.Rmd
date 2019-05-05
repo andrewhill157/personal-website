@@ -1,0 +1,976 @@
+---
+title: "Dimensionality Reduction for scATAC-seq Data"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+This is an R markdown document to accompany my blog post on dimensionality reduction for scATAC-seq data. It downloads all the data and generates all the figures for the blog (except for results drawn from other papers). I hope it will serve as a useful resource for the exploration of methods described in the post.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Dependencies
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+options(stringsAsFactors = FALSE)
+library(Matrix)
+library(DelayedArray)
+library(Seurat)
+library(ggplot2)
+library(irlba)
+library(patchwork)
+library(plyr)
+library(dplyr)
+library(stringr)
+library(SnapATAC)
+library(GenomicRanges)
+library(cisTopic)
+```
+
+The libraries loaded above must all be installed. Note that several PCA steps are involved that can be much faster depending on which version of BLAS your R installation is linked against. For example, I am running this on my Mac and it uses the Accelerate framework version of BLAS, which is quite fast (and if you are on a Mac, you will probably find the same). OpenBLAS and similar are also quite fast. Being linked against the default R version of BLAS will tend to be slower. I just want to mention it as it can result in fairly large speed differences.
+
+```{r session}
+sessionInfo()
+```
+
+## Setting up utility functions
+There are a few utility functions that we'll need later on. Note that the TF-IDF function is longer than it really needs to be as it provides several options and also has an out of memory matrix multiplication implementation that it falls back on.
+
+Note that I use the `lsi_workflow` function with `log_scale_tf=TRUE` for the LSI logTF discussed in the blog post. This also seems to work pretty much same as the version of LSI that 10x uses, which I have tried to replicate in the `tenx_lsi_workflow` function. Both are maintained here in case you want to compare.
+
+```{r utility_functions, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+########################################
+# Utility functions
+########################################
+# Loads 10x dataset into a sparse matrix object
+# Args:
+#   matrix_fn (string): name of mtx or mtx.gz file coontaining MM formatted matrix
+#   peaks_fn (string): name of peaks BED file (matches rows of matrix)
+#   barcodes_fn (string): name of file containing cell barcodes (matches columns of matrix)
+# Returns:
+#   sparse matrix: matrix represented by files above with row and column names set (chr_start_stop format used for rownames)
+load_tenx_atac = function(matrix_fn, peaks_fn, barcodes_fn) {
+  atac_matrix = readMM(matrix_fn)
+  colnames(atac_matrix) = read.delim(barcodes_fn, header=FALSE)$V1
+  peaks = read.delim(peaks_fn, header=FALSE)
+  peaks = paste(peaks$V1, peaks$V2, peaks$V3, sep = '_')
+  rownames(atac_matrix) = peaks
+  return(atac_matrix)
+}
+
+# Allows filtering of sites measured as non-zero in less than a given number of cells
+# Args:
+#   bmat (sparse matrix): sparse matrix (binarized)
+#   cells (int): filter sites if they have less than this number of cells above zero
+# Returns:
+#   sparse matrix: filtered sparse matrix
+filter_features = function(bmat, cells=10) {
+  bmat = bmat[Matrix::rowSums(bmat) >= cells, ]
+  return(bmat)
+}
+
+# Allows filtering of cells with below a given number of non-zero features
+# Args:
+#   bmat (sparse matrix): sparse matrix (binarized)
+#   features_above_zero (int): filter cells if they have less than this number of features above zero
+# Returns:
+#   sparse matrix: filtered sparse matrix
+filter_cells = function(bmat, features_above_zero=100) {
+  bmat = bmat[, Matrix::colSums(bmat > 0) >= features_above_zero]
+  return(bmat)
+}
+
+# Takes sparse matrix object and downsamples to a given fraction of entries remaining.
+# Args:
+#   bmat (sparse matrix): sparse matrix to downsample
+#   fraction_remaining (float): float (0, 1) that indicates fraction of non-zero entries to retain
+#   cells_per_site_min (int): min cells a site must be measured in to retain the site in matrix
+#   sites_per_cell_min (int): min sites a cell must have non-zero entries in to retain the cell in matrix
+# Returns:
+#   sparse matrix: downsampled sparse matrix
+downsample_matrix = function(bmat, fraction_remaining=0.5, cells_per_site_min=1, sites_per_cell_min=1) {
+  set.seed(2019)
+  non_zero_entries = which(bmat@x > 0)
+  indices_to_zero = sample(non_zero_entries, size=ceiling(length(non_zero_entries) * (1 - fraction_remaining)))
+  bmat@x[indices_to_zero] = 0
+  
+  # Make sure to get rid of stuff that has gone to ~ 0 after downsampling
+  bmat = filter_features(bmat, cells=cells_per_site_min)
+  bmat = filter_cells(bmat, features_above_zero=sites_per_cell_min)
+  return(bmat)
+}
+
+########################################
+# Functions for LSI
+########################################
+# Helper function to fall back on out of memory matrix multiplication if needed for TF * IDF
+# Args:
+#   tf (sparse matrix): term frequency matrix
+#   idf (vector): IDF vector
+#   block_size (int): block size for DelayedArray
+# Returns:
+#   sparse matrix: TF-IDF matrix
+safe_tfidf_multiply = function(tf, idf,  block_size=2000e6) {
+  result = tryCatch({
+    result = tf * idf
+    result
+  }, error = function(e) {
+    options(DelayedArray.block.size=block_size)
+    DelayedArray:::set_verbose_block_processing(TRUE)
+    
+    tf = DelayedArray(tf)
+    idf = as.matrix(idf)
+    
+    result = tf * idf
+    result
+  })
+  result = as(result, "sparseMatrix")
+  return(result)
+}
+
+# Perform TF-IDF on binary matrix
+# Args:
+#   bmat (sparse matrix): sparse matrix to downsample
+#   frequencies (bool): divide bmat by colSums (if FALSE simply use bmat for TF matrix)
+#   log_scale_tf (bool): log scale TF matrix if TRUE
+#   scale_factor (float): multiply terms in TF matrix by scale_factor prior to log1p. Equivalent to adding small pseudocount but doesn't cast to dense matrix at any point.
+# Returns:
+#   sparse matrix: TF-IDF matrix
+tfidf = function(bmat, frequencies=TRUE, log_scale_tf=TRUE, scale_factor=100000) {
+  # Use either raw counts or divide by total counts in each cell
+  if (frequencies) {
+    # "term frequency" method
+    tf = t(t(bmat) / Matrix::colSums(bmat))
+  } else {
+    # "raw count" method
+    tf = bmat
+  }
+  
+  # Either TF method can optionally be log scaled
+  if (log_scale_tf) {
+    if (frequencies) {
+      tf@x = log1p(tf@x * scale_factor)
+    } else {
+      tf@x = log1p(tf@x * 1)
+    }
+  }
+  
+  # IDF w/ "inverse document frequency smooth" method
+  idf = log(1 + ncol(bmat) / Matrix::rowSums(bmat))
+  
+  # TF-IDF
+  tf_idf_counts = safe_tfidf_multiply(tf, idf)
+  rownames(tf_idf_counts) = rownames(bmat)
+  colnames(tf_idf_counts) = colnames(bmat)
+  return(tf_idf_counts)
+}
+
+# Perform current version of TF-IDF used by 10x on binary matrix
+# Args:
+#   bmat (sparse matrix): sparse matrix to downsample
+# Returns:
+#   sparse matrix: TF-IDF matrix
+tenx_tfidf = function(bmat) {
+  idf = log(ncol(bmat) + 1) - log(1 + Matrix::rowSums(bmat))
+  tf_idf_counts = safe_tfidf_multiply(bmat, idf)
+  
+  rownames(tf_idf_counts) = rownames(bmat)
+  colnames(tf_idf_counts) = colnames(bmat)
+  tf_idf_counts = as(tf_idf_counts, "sparseMatrix")
+  return(tf_idf_counts)
+}
+
+# Perform fast PCA (irlba) on matrix, retaining observation names
+# Args:
+#   mat (sparse matrix): matrix to use for PCA (no further scaling or centering done)
+#   dims (int): number of PCs to calculate
+# Returns:
+#   sparse matrix: TF-IDF matrix
+do_pca = function(mat, dims=50) {
+  pca.results = irlba(t(mat), nv=dims)
+  final_result = pca.results$u %*% diag(pca.results$d)
+  rownames(final_result) = colnames(mat)
+  colnames(final_result) = paste0('PC_', 1:dims)
+  return(final_result)
+}
+
+########################################
+# Helper functions for dim reduction
+########################################
+# Wrapper for performing further dim reduction (tSNE/UMAP) and clustering given PCA space via Seurat.
+# Args:
+#   atac_matrix (sparse matrix): matrix to store in Seurat object (not used in computations)
+#   cell_embeddings (matrix): typically PCA coordinates of cells but could be any set of reduced dim coordinates
+#   dims (vector of int): vector of dims to use from cell_embeddings in downstream analysis
+#   metadata (dataframe): dataframe of metadata (rowonames are cell names) to add to Seurat object
+#   reduction (string): reduction to use for downstream steps. Can be 'pca' (cell_embeddings) or 'pca.l2' (L2 normalized cell_embeddings)
+# Returns:
+#   Seurat object: seurat object
+run_dim_reduction = function(atac_matrix, cell_embeddings, dims, metadata=NULL, reduction='pca.l2') {
+  if (is.null(metadata)) {
+    seurat_obj = Seurat::CreateSeuratObject(atac_matrix)
+  } else {
+    seurat_obj = Seurat::CreateSeuratObject(atac_matrix, meta.data = metadata)
+  }
+
+  seurat_obj[['pca']] = Seurat::CreateDimReducObject(embeddings=cell_embeddings, key='PC_', assay='RNA')
+  seurat_obj = seurat_obj %>%
+                Seurat::L2Dim(reduction='pca') %>%
+                Seurat::RunUMAP(reduction = reduction, dims = dims) %>%
+                Seurat::RunTSNE(reduction = reduction, dims = dims) %>%
+                Seurat::FindNeighbors(reduction=reduction, nn.eps=0.25, dims=dims)
+  return(seurat_obj)
+}
+
+# Helper function for plotting Spearman correlations of a given metadata column with all dimensions in a reduced space.
+# Args:
+#   seurat_obj (seurat object): Seurat object to use
+#   reduction (string): name of reduction to use
+#   column (string): name of column in metadata to use
+# Returns:
+#   ggplot object: plot object
+plot_pc_correlation = function(seurat_obj, reduction, column='nCount_RNA') {
+  coords = Seurat::Embeddings(seurat_obj, reduction=reduction)
+  column_value = seurat_obj@meta.data[, column]
+  correlations = apply(coords, 2, function(x) {cor(x, column_value, method='spearman')})
+  correlations_df = data.frame(correlation=correlations, PC=1:ncol(coords))
+  
+  plot_obj = ggplot(correlations_df, aes(PC, correlation)) +
+    geom_point() +
+    theme_classic() +
+    geom_hline(yintercept = 0, linetype='dashed', color='red')
+    
+  return(plot_obj)
+}
+
+########################################
+# Wrapper functions for workflows
+########################################
+# Wrapper for full LSI workflow (TF-IDF and PCA + clustering + further dim reduction)
+# Args:
+#   bmat (sparse matrix): sparse matrix (binarized)
+#   dims (vector of int): vector of dims to use from cell_embeddings in downstream analysis
+#   metadata: dataframe of metadata (rowonames are cell names) to add to Seurat object
+#   log_scale_tf (bool): log scale TF matrix if TRUE
+#   reduction (string): reduction to use for downstream steps. Can be 'pca' (cell_embeddings) or 'pca.l2' (L2 normalized cell_embeddings)
+#   resolution (float): resolution parameter to Seurat Louvain clustering
+# Returns:
+#   Seurat object: Seurat object. clustering + tSNE + UMAP done on PCA results from TF-IDF matrix.
+lsi_workflow = function(bmat, dims, metadata=NULL, log_scale_tf=TRUE, reduction='pca.l2', resolution=0.3) {
+  tfidf_mat = tfidf(bmat, log_scale_tf=log_scale_tf)
+  pca_mat = do_pca(tfidf_mat, dims=max(dims))
+  
+  seurat_obj = run_dim_reduction(bmat, pca_mat, dims, metadata) %>%
+                Seurat::FindClusters(reduction=reduction, n.start=20, resolution=resolution)
+  return(seurat_obj)
+}
+
+# Wrapper for 10x version of full LSI workflow (TF-IDF and PCA + clustering + further dim reduction). Only TF-IDF step is modified.
+# Args:
+#   bmat (sparse matrix): sparse matrix (binarized)
+#   dims (vector of int): vector of dims to use from cell_embeddings in downstream analysis
+#   metadata: dataframe of metadata (rownames are cell names) to add to Seurat object
+#   reduction (string): reduction to use for downstream steps. Can be 'pca' (cell_embeddings) or 'pca.l2' (L2 normalized cell_embeddings)
+#   resolution (float): resolution parameter to Seurat Louvain clustering
+# Returns:
+#   Seurat object: Seurat object. clustering + tSNE + UMAP done on PCA results from TF-IDF matrix.
+tenx_lsi_workflow = function(bmat, dims, metadata=NULL, reduction='pca.l2', resolution=0.3) {
+  tfidf_mat = tenx_tfidf(bmat)
+  pca_mat = do_pca(tfidf_mat, dims=max(dims))
+  
+  seurat_obj = run_dim_reduction(bmat, pca_mat, dims, metadata) %>%
+                Seurat::FindClusters(reduction=reduction, n.start=20, resolution=resolution)
+  return(seurat_obj)
+}
+
+# Runs cisTopic on binary matrix.
+# Args:
+#   bmat (sparse matrix): sparse matrix (binarized)
+#   topic (vector of int): topic numbers to generate models for
+# Returns:
+#   cisTopic object: cisTopic object with models generated
+cistopic_workflow = function(bmat, topic=c(40, 50)) {
+  coords = str_split_fixed(rownames(bmat), '_', 3)
+  new_coords = paste0(coords[, 1], ':', coords[, 2], '-', coords[, 3])
+  rownames(bmat) = new_coords
+
+  cisTopicObject = cisTopic::createcisTopicObject(bmat, project.name='mouse_atac')
+  cisTopicObject = cisTopic::runModels(cisTopicObject, topic, seed=2019, nCores=1, burnin = 250, iterations = 500)
+  return(cisTopicObject)
+}
+
+# Wrapper for SnapATAC workflow up until PCA step.
+# Args:
+#   snap_file (string): path to snap file
+#   promooter.df (dataframe): dataframe with promoter definitions as shown in SnapATAC tutorials (dataframe not file name; see examples in markdown)
+#   blacklist.df (dataframe): dataframe with blacklist region definitions as shown in SnapATAC tutorials (dataframe not file name; see examples in markdown)
+#   fragment_number_threshold (int): threshold for number of unique fragments per cell
+#   promoter_ratio_range (c(float, float)): vector with lower and upper bound of acceptable fraction of reads in promoter regions for cell filtering as used in SnapATAC tutorial.
+#   window_z_range (c(float, float)): vector with lower and upper bound of acceptable window z-scores for non-zero entries for site filtering as used in SnapATAC tutorial.
+#   sample_name (string): sample_name provided to SnapATAC
+#   pc.num (int): total PCs to compute
+# Returns:
+#   snap object: SnapATAC object
+# Notes:
+#   This uses single core because multithreaded implementation interferes with Knitr. In running this code, any do.par=FALSE and num.cores=1 could be changed as needed.
+snapatac_workflow = function(snap_file, promoter.df=NULL, blacklist.df=NULL, fragment_number_threshold=500, promoter_ratio_range=c(0.2, 0.8), window_z_range=c(-1.5, 1.5), sample_name='default', pc.num=50) {
+  x.sp = createSnap(
+    file=snap_file,
+    sample=sample_name,
+    do.par=FALSE,
+    num.cores=1
+  )
+  
+  plotBarcode(
+    obj=x.sp, 
+    pdf.file.name=NULL, 
+    pdf.width=7, 
+    pdf.height=7, 
+    col="grey",
+    border="grey",
+    breaks=50
+  )
+  
+  x.sp = filterCells(
+    obj=x.sp, 
+    subset.names=c("fragment.num", "UMI"),
+    low.thresholds=c(fragment_number_threshold, fragment_number_threshold),
+    high.thresholds=c(Inf, Inf)
+  )
+  
+  x.sp = addBmatToSnap(x.sp, bin.size=5000, num.cores=1)
+
+  # Optionally filter cells based on ratio of reads in promoters
+  if (!is.null(promoter.df)) {
+    promoter.gr = GRanges(promoter.df[,1], IRanges(promoter.df[,2], promoter.df[,3]))
+    ov = findOverlaps(x.sp@feature, promoter.gr)
+    idy = queryHits(ov)
+    promoter_ratio = SnapATAC::rowSums(x.sp[,idy, mat="bmat"], mat="bmat") / SnapATAC::rowSums(x.sp, mat="bmat")
+    plot(log(SnapATAC::rowSums(x.sp, mat="bmat") + 1,10), promoter_ratio, cex=0.5, col="grey", xlab="log(count)", ylab="FIP Ratio", ylim=c(0,1 ))
+    idx = which(promoter_ratio > promoter_ratio_range[1] & promoter_ratio < promoter_ratio_range[2])
+    x.sp = x.sp[idx,]
+  }
+  
+  x.sp = makeBinary(x.sp, mat="bmat");
+  
+  # Filter out non-standard contigs if present
+  idy2 = grep("chrM|random", x.sp@feature)
+  
+  if (!is.null(blacklist.df)) {
+  black_list.gr = GRanges(
+    blacklist.df[,1], 
+    IRanges(blacklist.df[,2], blacklist.df[,3])
+  )
+    idy1 = queryHits(findOverlaps(x.sp@feature, black_list.gr))
+    
+  } else {
+    # No blacklist provided, so just ignore
+    idy1 = c()
+  }
+  
+  idy = unique(c(idy1, idy2))
+  x.sp = x.sp[,-idy, mat="bmat"]
+  
+  # Filter based on frequency
+  x.sp = filterBins(
+    x.sp,
+    low.threshold=window_z_range[1],
+    high.threshold=window_z_range[2],
+    mat="bmat"
+  )
+  
+  plotBinCoverage(
+    x.sp,
+    pdf.file.name=NULL,
+    col="grey",
+    border="grey",
+    breaks=10,
+    xlim=c(-6,6)
+  )
+  
+  x.sp = runJaccard(
+    obj = x.sp,
+    tmp.folder=tempdir(),
+    mat = "bmat",
+    max.var=2000,
+    ncell.chunk=1000,
+    do.par=FALSE,
+    num.cores=1,
+    seed.use=10
+  )
+
+  x.sp = runNormJaccard(
+    obj = x.sp,
+    tmp.folder=tempdir(),
+    ncell.chunk=1000,
+    method="normOVE",
+    row.center=TRUE,
+    row.scale=TRUE,
+    low.threshold=-5,
+    high.threshold=5,
+    do.par=FALSE,
+    num.cores=1,
+    seed.use=10
+  )
+
+  x.sp = runDimReduct(
+    x.sp,
+    pc.num=pc.num,
+    input.mat="jmat",
+    method="svd",
+    center=TRUE,
+    scale=FALSE,
+    seed.use=10
+  )
+
+  rownames(x.sp@bmat) = x.sp@barcode
+  colnames(x.sp@bmat) = as.character(1:ncol(x.sp@bmat))
+
+  return(x.sp)
+}
+
+# Reperform Jaccard + PCA on SnapATAC object (used for redoing after modifying matrix)
+# Args:
+#   snao_obj (snap object): snap object
+#   pc.num (int): total PCs to compute
+# Returns:
+#   snap object: SnapATAC object
+# Notes:
+#   This uses single core because multithreaded implementation interferes with Knitr. In running this code, any do.par=FALSE and num.cores=1 could be changed as needed.
+snapatac_rerun_jaccard = function(snap_obj, pc.num=50) {
+  
+  snap_obj = runJaccard(
+    obj = snap_obj,
+    tmp.folder=tempdir(),
+    mat = "bmat",
+    max.var=2000,
+    ncell.chunk=1000,
+    do.par=FALSE,
+    num.cores=1,
+    seed.use=10
+  )
+
+  snap_obj = runNormJaccard(
+    obj = snap_obj,
+    tmp.folder=tempdir(),
+    ncell.chunk=1000,
+    method="normOVE",
+    row.center=TRUE,
+    row.scale=TRUE,
+    low.threshold=-5,
+    high.threshold=5,
+    do.par=FALSE,
+    num.cores=1,
+    seed.use=10
+  )
+
+  snap_obj = runDimReduct(
+    snap_obj,
+    pc.num=pc.num,
+    input.mat="jmat",
+    method="svd",
+    center=TRUE,
+    scale=FALSE,
+    seed.use=10
+  )
+}
+
+# Wrapper for cisTopic workflow (choose from models that have been run + clustering + further dim reduction)
+# Args:
+#   cistopicObject (cistopic object): cisTopic object with runModels having already been run
+#   dims (vector of int): vector of dims to use from cell_embeddings in downstream analysis
+#   method (string): method argument to modelMatSelection function in cisTopic
+#   reduction (string): reduction to use for downstream steps. Can be 'pca' (cell_embeddings) or 'pca.l2' (L2 normalized cell_embeddings)
+#   resolution (float): resolution parameter to Seurat Louvain clustering
+# Returns:
+#   Seurat object: Seurat object. clustering + tSNE + UMAP done on topic matrix from cisTopic
+seurat_workflow_on_cistopic = function(cistopicObject, method='Z-score', reduction='pca', resolution=0.3) {
+  cistopicObject = cisTopic::selectModel(cistopicObject)
+
+  cistopicObject.reduced_space = t(cisTopic::modelMatSelection(cistopicObject, target='cell', method=method))
+  colnames(cistopicObject.reduced_space) = paste0('PC_', 1:ncol(cistopicObject.reduced_space))
+  dimensions = ncol(cistopicObject.reduced_space)
+  
+  cistopicObject.seurat = run_dim_reduction(cistopicObject@binary.count.matrix, cistopicObject.reduced_space, dims=1:dimensions, reduction='pca')
+  
+  cistopicObject.seurat = cistopicObject.seurat %>% 
+    Seurat::FindNeighbors(reduction=reduction, nn.eps=0.25, dims=1:dimensions) %>%
+    Seurat::FindClusters(reduction=reduction, n.start=20, resolution=resolution)
+  return(cistopicObject.seurat)
+}
+
+# Wrapper for running downstream Seurat workflow (clustering + further dim reduction) on PCA from Jaccard matrix generated by SnapATAC
+# Args:
+#   snao_obj (snap object): snap object with runDimReduct already run
+#   dims (vector of int): vector of dims to use from cell_embeddings in downstream analysis
+#   reduction (string): reduction to use for downstream steps. Can be 'pca' (cell_embeddings) or 'pca.l2' (L2 normalized cell_embeddings)
+#   resolution (float): resolution parameter to Seurat Louvain clustering
+# Returns:
+#   Seurat object: Seurat object. clustering + tSNE + UMAP done on PCA matrix from SnapATAC (note PCA is weighted by variance explained)
+seurat_workflow_on_jaccard_pca = function(snap_obj, dims, reduction='pca', resolution=0.3) {
+  pca_results.jaccard = snap_obj@smat@dmat %*% diag(snap_obj@smat@sdev)
+  colnames(pca_results.jaccard) = paste0('PC_', 1:ncol(pca_results.jaccard))
+  rownames(pca_results.jaccard) = snap_obj@barcode
+
+  seurat_obj.jaccard = run_dim_reduction(t(snap_obj@bmat), pca_results.jaccard, dims, reduction=reduction)
+  seurat_obj.jaccard = seurat_obj.jaccard %>%
+    Seurat::FindNeighbors(nn.eps=0.25, dims=dims, reduction=reduction) %>%
+    Seurat::FindClusters(n.start=20, resolution=resolution, dims=dims, reduction=reduction)
+}
+
+# Helper function to plot embeddings corresponding to same set of cells with one another's cluster assignments for comparison.
+# Args:
+#   seurat_obj1 (snap object): snap object with runDimReduct already run
+#   seurat_obj2 (vector of int): vector of dims to use from cell_embeddings in downstream analysis
+#   reduction (string): reduction to use for plot (can be tsne or umap)
+#   description1 (string): title for seurat_obj1 (used in plot)
+#   description2 (string): title for seurat_obj1 (used in plot)
+#   cluster_column1 (string): column from metadata of seurat_obj1 to use for coloring plot
+#   cluster_column2 (string): column from metadata of seurat_obj2 to use for coloring plot
+# Returns:
+#   ggolot object: ggplot object where each embedding is plotted colored by its own clusters and then again with the opposite object's clusters assigned for comparison. Four total panels shown.
+plot_clustering_comparison = function(seurat_obj1, seurat_obj2, reduction, description1='', description2 = '', cluster_column1='RNA_snn_res.0.3', cluster_column2='RNA_snn_res.0.3') {
+  # Clusters as called on each dataset
+  seurat_obj1 = SetIdent(seurat_obj1, value=cluster_column1)
+  seurat_obj2 = SetIdent(seurat_obj2, value=cluster_column2)
+  
+  p1 = DimPlot(seurat_obj1, reduction = 'tsne', pt.size=0.25) +
+            ggtitle(description1)
+  
+  p2 = DimPlot(seurat_obj2, reduction = 'tsne', pt.size=0.25) +
+            ggtitle(description2)
+  
+  # Now swap the labels to verify they are finding the same groups
+  seurat_obj1@meta.data$cluster_seurat_obj2 = seurat_obj2@meta.data[, cluster_column2]
+  seurat_obj2@meta.data$cluster_seurat_obj1 = seurat_obj1@meta.data[, cluster_column1]
+  
+  seurat_obj1 = SetIdent(seurat_obj1, value='cluster_seurat_obj2')
+  seurat_obj2 = SetIdent(seurat_obj2, value='cluster_seurat_obj1')
+  
+  p3 = DimPlot(seurat_obj1, reduction = reduction, pt.size=0.25) +
+            ggtitle(paste0(description1, ' (', description2, ' clusters)'))
+  
+  p4 = DimPlot(seurat_obj2, reduction = reduction, pt.size=0.25) +
+            ggtitle(paste0(description2, ' (', description1, ' clusters)'))
+  
+  (p1 + p3) / (p2 + p4)
+}
+```
+
+## Data
+We'll need some data files from our study [Cusanovich and Hill, et al. [Cell 2018]](https://www.cell.com/cell/fulltext/S0092-8674(18)30855-9), a public dataset from 10X, and some other auxillary files. I have also processed some of these datasets with SnapTools and provide `.snap` files that allow for comparison of the use of peaks and windows as features.
+
+```{r, eval = FALSE, message=FALSE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none"}
+dir.create('data_downloads', showWarnings = FALSE)
+
+# Cusanovich and Hill et al.
+download.file("http://krishna.gs.washington.edu/content/members/ajh24/mouse_atlas_data_release/matrices/atac_matrix.binary.qc_filtered.rds", "data_downloads/atac_matrix.binary.qc_filtered.rds")
+download.file("http://krishna.gs.washington.edu/content/members/ajh24/mouse_atlas_data_release/metadata/cell_metadata.tissue_freq_filtered.txt", "data_downloads/cell_metadata.tissue_freq_filtered.txt")
+
+# 10X Adult Mouse Brain
+download.file("http://cf.10xgenomics.com/samples/cell-atac/1.1.0/atac_v1_adult_brain_fresh_5k/atac_v1_adult_brain_fresh_5k_filtered_peak_bc_matrix.tar.gz", "data_downloads/atac_v1_adult_brain_fresh_5k_filtered_peak_bc_matrix.tar.gz")
+untar("data_downloads/atac_v1_adult_brain_fresh_5k_filtered_peak_bc_matrix.tar.gz", exdir = 'data_downloads/')
+
+# CisTopic outputs for both datasets
+download.file('https://krishna.gs.washington.edu/content/members/ajh24/2019_04_19_atac_dim_reduction_blogpost/data_release/WholeBrain_PFC.cistopic.rds', 'data_downloads/WholeBrain_PFC.cistopic.rds')
+download.file('http://krishna.gs.washington.edu/content/members/ajh24/2019_04_19_atac_dim_reduction_blogpost/data_release/atac_v1_adult_brain_fresh_5k.cistopic.rds', destfile = 'data_downloads/atac_v1_adult_brain_fresh_5k.cistopic.rds')
+
+# *.snap files produced by SnapTools for use with SnapATAC that I've made available
+download.file('https://krishna.gs.washington.edu/content/members/ajh24/2019_04_19_atac_dim_reduction_blogpost/data_release/atac_v1_adult_brain_fresh_5k.snap', 'data_downloads/atac_v1_adult_brain_fresh_5k.snap')
+download.file('https://krishna.gs.washington.edu/content/members/ajh24/2019_04_19_atac_dim_reduction_blogpost/data_release/WholeBrain_PFC.snap', 'data_downloads/WholeBrain_PFC.snap')
+
+# Auxillary datafiles
+## Promoter definitions
+download.file('http://renlab.sdsc.edu/r3fang/share/Fang_2019/MOs_snATAC/genes/promoter.bed', 'data_downloads/promoters.mm10.bed')
+download.file('https://krishna.gs.washington.edu/content/members/ajh24/2019_04_19_atac_dim_reduction_blogpost/data_release/promoters.mm9.bed', 'data_downloads/promoters.mm9.bed')
+download.file('https://krishna.gs.washington.edu/content/members/ajh24/2019_04_19_atac_dim_reduction_blogpost/data_release/promoters.hg19.bed', 'data_downloads/promoters.hg19.bed') # not used here
+
+## ENCODE blacklist regions
+download.file('http://mitra.stanford.edu/kundaje/akundaje/release/blacklists/mm10-mouse/mm10.blacklist.bed.gz', 'data_downloads/encode_blacklist.mm10.bed.gz')
+download.file('http://mitra.stanford.edu/kundaje/akundaje/release/blacklists/mm9-mouse/mm9-blacklist.bed.gz', 'data_downloads/encode_blacklist.mm9.bed.gz')
+download.file('http://mitra.stanford.edu/kundaje/akundaje/release/blacklists/hg19-human/wgEncodeHg19ConsensusSignalArtifactRegions.bed.gz', 'data_downloads/encode_blacklist.hg19.bed.gz')
+```
+
+## Published flavor of LSI vs. using log-scaled tf matrix
+As a first example, I'll data from Whole Brain and prefrontal cortex published as part of [Cusanovich and Hill, et al. [Cell 2018]](https://www.cell.com/cell/fulltext/S0092-8674(18)30855-9). I'm choosing this subset of the data because there is a recent preprint that uses a kmer-based method on this same subset (useful for comparison purposes). It's worth noting that we only used a fairly carefully selected subset of all peaks for dimensionality reduction in the actual paper, which helped us quite a bit in that case. Here I am using the much simpler method of simply filtering out rare sites to show that the version of LSI without log scaling the TF matrix is fairly sensitive to the sites you use as input compared to LSI logTF.
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+mouse.bmat = readRDS("data_downloads/atac_matrix.binary.qc_filtered.rds")
+mouse.metadata = read.delim("data_downloads/cell_metadata.tissue_freq_filtered.txt", sep='\t')
+rownames(mouse.metadata) = mouse.metadata$cell
+
+selected_tissues = c("WholeBrain", "PreFrontalCortex") #, "Cerebellum")
+selected_cells = subset(mouse.metadata, tissue %in% selected_tissues) %>% rownames()
+
+mouse.metadata = mouse.metadata[selected_cells, ]
+mouse.bmat = mouse.bmat[, selected_cells]
+
+# Take top 100000 peaks by frequency.
+# Some filtering is important here because the peaks in this study were a merged set of peaks so many would not ever be called 
+# or perhaps even observed in more than a few cells within this particular subset (in contrast to datasets composed of individual samples).
+# The particular number doesn't impact LSI results much, but smaller makes cisTopic a bit faster.
+top_sites = rank(-Matrix::rowSums(mouse.bmat)) <= 100000
+mouse.bmat = mouse.bmat[top_sites,]
+```
+
+Show the distribition of TF matrix entries when dividing by total counts. Note that this is not relevant for the 10x method, which just uses the matrix counts rather than dividing by total counts.
+```{r}
+tf = t(t(mouse.bmat) / Matrix::colSums(mouse.bmat))
+comparison_df = rbind(data.frame(value=tf@x, method='TF'), data.frame(value=log1p(tf@x * 100000), method='log TF'))
+
+ggplot(comparison_df, aes(value)) +
+  geom_histogram(bins = 70, aes(fill=method), color='black') +
+  theme_classic() +
+  scale_fill_manual(values=c("TF"="red", "log TF"="#d3d3d3")) +
+  xlab('value in matrix') +
+  facet_wrap(~method, scales='free')
+```
+
+Next, run LSI with and without log scaling the TF matrix in TF-IDF and compare, all with the same peaks/cells as input.
+
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+# lsi_workflow and most other similar workflow functions return Seurat objects
+mouse.seurat.lsi = lsi_workflow(mouse.bmat, dims=2:50, metadata=mouse.metadata, log_scale_tf=FALSE, reduction='pca')
+mouse.seurat.lsi_log = lsi_workflow(mouse.bmat, dims=2:50, metadata=mouse.metadata, log_scale_tf=TRUE, reduction='pca.l2')
+```
+
+`pca.l2` here refers to an L2 normalized PCA space, which we find can sometimes (but not always) improve clustering results relative to using the raw PCA space. This is used throughout the post but doesn't seem to matter much for these datasets.
+
+Note that by specifying `dims=2:50` we are not using the first PC in downstreame analysis. Here I confirm that the first PC is highly correlated with depth (which is why we drop, although you could also use something like limma to regress out log10(total counts)). I won't show this in most cases moving forward. As others have noted, we find that dropping the first PC (so long as it is strongly correlated with read depth) oftene improves results somewhat, particularly for very sparse datasets.
+```{r}
+p1 = plot_pc_correlation(mouse.seurat.lsi, reduction = 'pca') +
+      ggtitle('LSI')
+
+p2 = plot_pc_correlation(mouse.seurat.lsi_log, reduction = 'pca') +
+      ggtitle('LSI With Log Scaled TF')
+
+p1 + p2
+```
+
+Compare tSNE plots with original cluster annotations from each method and then applying cluster annotations derived from the method being compared to to evaluate concordance. Note that the primary "metrics" used to assess "better" performance or "equivalent" performance throughout this post are:
+1) Clustering results at identical resolution with exactly the same sites and peaks used as input.
+2) Concordance of dimensionality reduction/clustering visually between two or more methods.
+
+While these are not perfect metrics, the differences that I care about here are large enough that I think they are sufficient for the claims I am trying to make. I am fairly confident in the claims given that very similar dimensionality reduction and clustering results are achieved across multiple different methods in many cases. Subtle differences would require more extensive comparison.
+
+```{r, fig.height=9, fig.width=11}
+plot_clustering_comparison(mouse.seurat.lsi,
+                           mouse.seurat.lsi_log,
+                           reduction='tsne',
+                           description1='LSI',
+                           description2='LSI logTF',
+                           cluster_column1='RNA_snn_res.0.3',
+                           cluster_column2='RNA_snn_res.0.3')
+```
+
+At least from first glance, it seems like log scaling the TF matrix makes a big difference in this context. As noted in the blog post, both of these approaches appear qualitately much better than the results from a k-mer based approach.
+
+### Comparison to cisTopic
+In order to confirm that the perceived improvement I was seeing here was reproducible with other tools (would make it less likely to be artifactual), I wanted to compare to cisTopic, an LDA-based approach. This takes quite a long time in my hands, so I am commenting the actual command out and just loading in precomputed results that were downloaded above. You can run the command yourself if you'd like. Note that in the blog post I also show a result from [Lareau, Duarte, Chew, et al.](https://www.biorxiv.org/content/10.1101/612713v1) that uses a kmer-based approach, which seems to perform worse than LSI or the other methods described here when used with this dataset.
+
+Select the model from 40 or 50 topics (this is what I specified when running) and then run the usual dim reduction and clustering:
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+# mouse.cistopic = cistopic_workflow(mouse.bmat)
+mouse.cistopic = readRDS('data_downloads/WholeBrain_PFC.cistopic.rds')
+mouse.seurat.cistopic = seurat_workflow_on_cistopic(mouse.cistopic, resolution=0.3, method='Z-score')
+```
+
+It's worth noting that the topics generated by LDA (cisTopic) don't correlate with depth in the same way as with LSI above, which is why I didn't drop any of them moving forward.
+```{r}
+plot_pc_correlation(mouse.seurat.cistopic, reduction = 'pca')
+```
+
+Compare results as above:
+
+```{r, fig.height=9, fig.width=11}
+plot_clustering_comparison(mouse.seurat.lsi_log,
+                           mouse.seurat.cistopic,
+                           reduction='tsne',
+                           description1='LSI logTF',
+                           description2='cisTopic',
+                           cluster_column1='RNA_snn_res.0.3',
+                           cluster_column2='RNA_snn_res.0.3')
+```
+
+Overall, this looks quite promising. Both are in the same ballpark and look qualitatively very similar. However, LSI takes much less time to run (on scale of a minute or two vs. several hours even for a fairly small dataset).
+
+Note that we perform the PCA step of LSI using an approximate SVD implemented in `irlba` which is much much faster when your R installation is linked against a good linear algebra library on the backend (see Dependencies section above).
+
+### Comparison to a Jaccard-based method
+For the Jaccard-based method, I am using SnapATAC after generating `*.snap` files using SnapTools for both our own mouse brain dataset and the 10x genomics dataset used above.
+
+Note that in this comparison, to make sure that I am running LSI on the same input, I'll be following the standard SnapATAC workflow and running LSI on the resulting binary matrix of 5kb windows in the genome.
+
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+promoter.df = read.table("data_downloads/promoters.mm9.bed");
+blacklist.df = read.table("data_downloads/encode_blacklist.mm9.bed.gz")
+
+mouse.snap_obj = snapatac_workflow('data_downloads/WholeBrain_PFC.snap',
+                                     promoter.df=promoter.df,
+                                     blacklist.df = blacklist.df,
+                                     window_z_range=c(-1.5, 1.5),
+                                     fragment_number_threshold=1000,
+                                     promoter_ratio_range=c(0.2, 0.8))
+```
+
+In order to more directly compare what LSI and SnapATAC performance, I will extract the final binary window matrix and run our LSI workflow on it.
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+mouse.seurat.lsi_log.windows = lsi_workflow(t(mouse.snap_obj@bmat), dims=2:50, log_scale_tf = TRUE)
+```
+
+Note that to avoid differences in downstream clustering approaches or other decisions independent of the actual reduction to a PCA space that might make a difference in perceived results, I extract the PCA coordinates from the SnapATAC object and then run the remainder of our downstream workflow on those. Note this will be faster than the above in part due to the fact that we are already starting from the PCA coodinates.
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+mouse.seurat.snap = seurat_workflow_on_jaccard_pca(mouse.snap_obj, dims=1:50)
+```
+
+Now plot the results:
+```{r, fig.height=9, fig.width=11}
+plot_clustering_comparison(mouse.seurat.lsi_log.windows,
+                           mouse.seurat.snap,
+                           reduction='tsne',
+                           description1='LSI logTF',
+                           description2='SnapATAC',
+                           cluster_column1='RNA_snn_res.0.3',
+                           cluster_column2='RNA_snn_res.0.3')
+```
+
+## 10X Adult Mouse Brain Dataset
+To see if the above also holds true on other datasets, I also looked at the adult mouse brain scATAC data recently provided by 10x.
+
+First, read in the data:
+````{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+tenx_mouse.bmat = load_tenx_atac('data_downloads/filtered_peak_bc_matrix/matrix.mtx', 'data_downloads/filtered_peak_bc_matrix/peaks.bed', 'data_downloads/filtered_peak_bc_matrix/barcodes.tsv')
+tenx_mouse.bmat = filter_features(tenx_mouse.bmat, cells=50)
+
+# Binarize the matrix for consistency
+tenx_mouse.bmat@x[tenx_mouse.bmat@x > 1] = 1
+```
+
+Run both flavors of LSI. Note that this is a smaller dataset and I chose a higher resolution parameter than above for clustering here for the purposes of some of the comparisons in the blog. In all cases, I will consistently use the same resolution parameter when comparing results using two methods on the same dataset.
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+tenx_mouse.seurat.lsi = lsi_workflow(tenx_mouse.bmat, dims=2:50, log_scale_tf=FALSE, reduction='pca', resolution=1.5)
+tenx_mouse.seurat.lsi_log = lsi_workflow(tenx_mouse.bmat, dims=2:50, log_scale_tf=TRUE, reduction='pca.l2', resolution=1.5)
+```
+
+Now plot the results:
+```{r, fig.height=9, fig.width=11}
+plot_clustering_comparison(tenx_mouse.seurat.lsi,
+                           tenx_mouse.seurat.lsi_log,
+                           reduction='tsne',
+                           description1='LSI',
+                           description2='LSI logTF',
+                           cluster_column1='RNA_snn_res.1.5',
+                           cluster_column2='RNA_snn_res.1.5')
+```
+
+Again, the version of LSI with log scaling seems to provide substantially better resolution.
+
+### Comparison to cisTopic
+Read in data same as above and run our workflow on cisTopic cell by topic matrix (again, you can run the actual command rather than reading in precomputed results if you'd like):
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+#tenx_mouse.cistopic = cistopic_workflow(tenx_mouse.bmat)
+tenx_mouse.cistopic = readRDS('data_downloads/atac_v1_adult_brain_fresh_5k.cistopic.rds')
+tenx_mouse.seurat.cistopic = seurat_workflow_on_cistopic(tenx_mouse.cistopic, resolution=1.5, method='Z-score')
+```
+
+Now plot the results:
+```{r, fig.height=9, fig.width=11}
+plot_clustering_comparison(tenx_mouse.seurat.lsi_log,
+                           tenx_mouse.seurat.cistopic,
+                           reduction='tsne',
+                           description1='LSI logTF',
+                           description2='cisTopic',
+                           cluster_column1='RNA_snn_res.1.5',
+                           cluster_column2='RNA_snn_res.1.5')
+```
+
+### Comparison to a Jaccard-based method
+Comparing again to SnapATAC:
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+promoter.df = read.delim("data_downloads/promoters.mm10.bed", sep="\t")
+blacklist.df = read.delim("data_downloads/encode_blacklist.mm10.bed.gz", sep="\t")
+
+tenx_mouse.snap_obj = snapatac_workflow('data_downloads/atac_v1_adult_brain_fresh_5k.snap',
+                                     promoter.df=promoter.df,
+                                     blacklist.df = blacklist.df,
+                                     window_z_range=c(-1.5, 1.5),
+                                     fragment_number_threshold=500,
+                                     promoter_ratio_range=c(0.2, 0.8))
+```
+
+
+LSI logTF on windows:
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+tenx_mouse.seurat.lsi_log.windows = lsi_workflow(t(tenx_mouse.snap_obj@bmat), dims=2:50, log_scale_tf = TRUE)
+```
+
+Remainder of our workflow on Jaccard-derived PCA space:
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+tenx_mouse.seurat.snap = seurat_workflow_on_jaccard_pca(tenx_mouse.snap_obj, dims=1:50)
+```
+
+Now plot the results:
+```{r, fig.height=9, fig.width=11}
+plot_clustering_comparison(tenx_mouse.seurat.lsi_log.windows,
+                           tenx_mouse.seurat.snap,
+                           reduction='tsne',
+                           description1='LSI logTF',
+                           description2='SnapATAC',
+                           cluster_column1='RNA_snn_res.0.3',
+                           cluster_column2='RNA_snn_res.0.3')
+```
+
+## Windows vs. Peaks
+In the blog post, I discuss the pros and cons of using peaks vs. windows for dimensionality reduction. Here, I compare the results we would get with LSI when using either peaks or windows. Note that here I am redoing the peak-based LSI on each dataset such that the cells used match up with those in the window matrices, which where generated via SnapTools/SnapATAC and therefore contain a slightly different subset of cell barcodes.
+
+### Our mouse brain dataset
+Get set of cells that overlap in both peak and window matrices (generated via different tools, so not exactly overlapping), then run LSI on each:
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+overlaps = intersect(colnames(mouse.bmat), mouse.snap_obj@barcode)
+mouse.seurat.lsi_log.peaks_comparison = lsi_workflow(mouse.bmat[, colnames(mouse.bmat[, overlaps])], dims=2:50, log_scale_tf = TRUE)
+
+# we pretty much already ran this, but the set of cells will be slightly different from before, just making sure we're all equal here
+mouse.seurat.lsi_log.windows_comparison = lsi_workflow(t(mouse.snap_obj@bmat)[, rownames(mouse.snap_obj@bmat[overlaps, ])], dims=2:50, log_scale_tf = TRUE)
+```
+
+Plot for comparison:
+```{r, fig.height=9, fig.width=11}
+plot_clustering_comparison(mouse.seurat.lsi_log.peaks_comparison,
+                           mouse.seurat.lsi_log.windows_comparison,
+                           reduction='tsne',
+                           description1='LSI logTF peaks',
+                           description2='LSI logTF windows',
+                           cluster_column1='RNA_snn_res.0.3',
+                           cluster_column2='RNA_snn_res.0.3')
+```
+
+Very similar results using peaks/windows at least in this context.
+
+### 10x genomics dataset
+Same but on the 10X genomics mouse brain dataset:
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+overlaps = intersect(colnames(tenx_mouse.bmat), paste0(tenx_mouse.snap_obj@barcode, '-1')) # SnapATAC removes the -1
+overlaps_no_dash = stringr::str_replace(overlaps, '-1', '') # SnapATAC removes the -1
+tenx_mouse.seurat.lsi_log.peaks_comparison = lsi_workflow(tenx_mouse.bmat[, colnames(tenx_mouse.bmat[, overlaps])], dims=2:50, log_scale_tf = TRUE)
+
+# we pretty much already ran this, but the set of cells will be slightly different from before, just making sure we're all equal here
+tenx_mouse.seurat.lsi_log.windows_comparison = lsi_workflow(t(tenx_mouse.snap_obj@bmat)[, rownames(tenx_mouse.snap_obj@bmat[overlaps_no_dash, ])], dims=2:50, log_scale_tf = TRUE)
+```
+
+Plot for comparison:
+```{r, fig.height=9, fig.width=11}
+plot_clustering_comparison(tenx_mouse.seurat.lsi_log.peaks_comparison,
+                           tenx_mouse.seurat.lsi_log.windows_comparison,
+                           reduction='tsne',
+                           description1='LSI logTF peaks',
+                           description2='LSI logTF windows',
+                           cluster_column1='RNA_snn_res.0.3',
+                           cluster_column2='RNA_snn_res.0.3')
+```
+
+Again, very similar results using peaks/windows at this level of clustering. Would need to look at this further to understand if either has a clear performance advantage.
+
+## Downsampled data
+If we purely want to assess the impact of overall complexity on dimensionality reduction, we can just choose a subset of windows to zero out at random.
+
+It is worth noting that this by no means captures the real world variation in data quality for scATAC-seq data. Signal to noise ratio (e.g. as measured by FRiP, promoter enrichment, etc.) is also very important and would not be captured by this simple test. By this I just mean to say that datasets can look very different even at the same overall complexity due to a number of other factors.
+
+Here I chose to use the 10x mouse dataset rather than running on both of the datasets above, but in principle you could run either using similar commands.
+
+Try downsampling to 20% and 50% of the original depth:
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+set.seed(2019)
+
+tenx_mouse.window_bmat.downsampled_20 = downsample_matrix(t(tenx_mouse.snap_obj@bmat), fraction_remaining=0.2, cells_per_site_min=20, sites_per_cell_min=1)
+tenx_mouse.window_bmat.downsampled_50 = downsample_matrix(t(tenx_mouse.snap_obj@bmat), fraction_remaining=0.5, cells_per_site_min=20, sites_per_cell_min=1)
+
+median(Matrix::colSums(tenx_mouse.window_bmat.downsampled_20))
+median(Matrix::colSums(tenx_mouse.window_bmat.downsampled_50))
+```
+
+Run both versions of LSI and Jaccard method on each downsampled dataset:
+```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
+tenx_mouse.seurat.lsi.downsampled_20 = lsi_workflow(tenx_mouse.window_bmat.downsampled_20, dims=2:50, log_scale_tf=FALSE, reduction='pca')
+tenx_mouse.seurat.lsi_log.downsampled_20 = lsi_workflow(tenx_mouse.window_bmat.downsampled_20, dims=2:50, log_scale_tf=TRUE, reduction='pca.l2')
+
+tenx_mouse.seurat.lsi.downsampled_50 = lsi_workflow(tenx_mouse.window_bmat.downsampled_50, dims=2:50, log_scale_tf=FALSE, reduction='pca')
+tenx_mouse.seurat.lsi_log.downsampled_50 = lsi_workflow(tenx_mouse.window_bmat.downsampled_50, dims=2:50, log_scale_tf=TRUE, reduction='pca.l2')
+
+# We also never ran the LSI method without log scaling on windows, so do that too for comparison
+tenx_mouse.seurat.lsi.windows = lsi_workflow(t(tenx_mouse.snap_obj@bmat), dims=2:50, log_scale_tf = FALSE)
+
+# Also set up SnapATAC using these downsampled matrices
+windows_20_idx = which(rownames(tenx_mouse.window_bmat.downsampled_20) %in% rownames(t(tenx_mouse.snap_obj@bmat)))
+windows_50_idx = which(rownames(tenx_mouse.window_bmat.downsampled_50) %in% rownames(t(tenx_mouse.snap_obj@bmat)))
+tenx_mouse.snap_obj.downsampled_20 = tenx_mouse.snap_obj[,windows_20_idx, mat='bmat']
+tenx_mouse.snap_obj.downsampled_50 = tenx_mouse.snap_obj[,windows_50_idx, mat='bmat']
+tenx_mouse.snap_obj.downsampled_20@bmat = t(tenx_mouse.window_bmat.downsampled_20)
+tenx_mouse.snap_obj.downsampled_50@bmat = t(tenx_mouse.window_bmat.downsampled_50)
+
+# Rerun SnapATAC Jaccard method on downsampled matrices
+tenx_mouse.snap_obj.downsampled_20 = snapatac_rerun_jaccard(tenx_mouse.snap_obj.downsampled_20)
+tenx_mouse.seurat.snap.downsampled_20 = seurat_workflow_on_jaccard_pca(tenx_mouse.snap_obj.downsampled_20, dims=1:50)
+tenx_mouse.snap_obj.downsampled_50 = snapatac_rerun_jaccard(tenx_mouse.snap_obj.downsampled_50)
+tenx_mouse.seurat.snap.downsampled_50 = seurat_workflow_on_jaccard_pca(tenx_mouse.snap_obj.downsampled_50, dims=1:50)
+```
+
+Compare both methods at progressively higher downsampling rates, always coloring by original LSI logTF clusters
+```{r, fig.height=14, fig.width=16}
+# Put original clusters in all
+tenx_mouse.seurat.lsi.downsampled_20$original = tenx_mouse.seurat.lsi_log.windows@meta.data$RNA_snn_res.0.3
+tenx_mouse.seurat.lsi_log.downsampled_20$original = tenx_mouse.seurat.lsi_log.windows@meta.data$RNA_snn_res.0.3
+tenx_mouse.seurat.lsi.downsampled_50$original = tenx_mouse.seurat.lsi_log.windows@meta.data$RNA_snn_res.0.3
+tenx_mouse.seurat.lsi_log.downsampled_50$original = tenx_mouse.seurat.lsi_log.windows@meta.data$RNA_snn_res.0.3
+tenx_mouse.seurat.lsi.windows$original = tenx_mouse.seurat.lsi_log.windows@meta.data$RNA_snn_res.0.3
+tenx_mouse.seurat.snap.downsampled_20$original = tenx_mouse.seurat.lsi_log.windows@meta.data$RNA_snn_res.0.3
+tenx_mouse.seurat.snap.downsampled_50$original = tenx_mouse.seurat.lsi_log.windows@meta.data$RNA_snn_res.0.3
+tenx_mouse.seurat.snap$original = tenx_mouse.seurat.lsi_log.windows@meta.data$RNA_snn_res.0.3
+
+tenx_mouse.seurat.lsi.downsampled_20 = SetIdent(tenx_mouse.seurat.lsi.downsampled_20, value='original')
+tenx_mouse.seurat.lsi_log.downsampled_20 = SetIdent(tenx_mouse.seurat.lsi_log.downsampled_20, value='original')
+tenx_mouse.seurat.lsi.downsampled_50 = SetIdent(tenx_mouse.seurat.lsi.downsampled_50, value='original')
+tenx_mouse.seurat.lsi_log.downsampled_50 = SetIdent(tenx_mouse.seurat.lsi_log.downsampled_50, value='original')
+tenx_mouse.seurat.lsi.windows = SetIdent(tenx_mouse.seurat.lsi.windows, value='original')
+tenx_mouse.seurat.lsi_log.windows = SetIdent(tenx_mouse.seurat.lsi_log.windows, value='RNA_snn_res.0.3')
+
+tenx_mouse.seurat.snap.downsampled_20 = SetIdent(tenx_mouse.seurat.snap.downsampled_20, value='original')
+tenx_mouse.seurat.snap.downsampled_50 = SetIdent(tenx_mouse.seurat.snap.downsampled_50, value='original')
+tenx_mouse.seurat.snap = SetIdent(tenx_mouse.seurat.snap, value='original')
+
+p1 = DimPlot(tenx_mouse.seurat.lsi.downsampled_20, reduction='tsne', pt.size=0.25) + ggtitle('LSI (20%)')
+p2 = DimPlot(tenx_mouse.seurat.lsi_log.downsampled_20, reduction='tsne', pt.size=0.25) + ggtitle('LSI logTF (20%)')
+p3 = DimPlot(tenx_mouse.seurat.snap.downsampled_20, reduction='tsne', pt.size=0.25) + ggtitle('SnapATAC (20%)')
+p4 = DimPlot(tenx_mouse.seurat.lsi.downsampled_50, reduction='tsne', pt.size=0.25) + ggtitle('LSI (50%)')
+p5 = DimPlot(tenx_mouse.seurat.lsi_log.downsampled_50, reduction='tsne', pt.size=0.25) + ggtitle('LSI logTF (50%)')
+p6 = DimPlot(tenx_mouse.seurat.snap.downsampled_50, reduction='tsne', pt.size=0.25) + ggtitle('SnapATAC (50%)')
+p7 = DimPlot(tenx_mouse.seurat.lsi.windows, reduction='tsne', pt.size=0.25) + ggtitle('LSI (100%)')
+p8 = DimPlot(tenx_mouse.seurat.lsi_log.windows, reduction='tsne', pt.size=0.25) + ggtitle('LSI logTF (100%)')
+p9 = DimPlot(tenx_mouse.seurat.snap, reduction='tsne', pt.size=0.25) + ggtitle('SnapATAC (100%)')
+
+(p1 + p4 + p7) / (p2 + p5 + p8) / (p3 + p6 + p9)
+```
+
+Both SnapATAC and our logTF version of LSI seem to perform quite comarably at reduced depth. While the plots above look very consistent, there is a slight decrease in the number of clusters called by Seurat for all approaches with downsampling using a consistent resolution parameter (although using a higher resolution paramter would probably enable similar groupings, which is great).
+```{r, results='hold'}
+print('LSI')
+max(as.numeric(tenx_mouse.seurat.lsi.downsampled_20@meta.data$RNA_snn_res.0.3))
+max(as.numeric(tenx_mouse.seurat.lsi.downsampled_50@meta.data$RNA_snn_res.0.3))
+max(as.numeric(tenx_mouse.seurat.lsi.windows@meta.data$RNA_snn_res.0.3))
+
+print('---------')
+print('LSI logTF')
+max(as.numeric(tenx_mouse.seurat.lsi_log.downsampled_20@meta.data$RNA_snn_res.0.3))
+max(as.numeric(tenx_mouse.seurat.lsi_log.downsampled_50@meta.data$RNA_snn_res.0.3))
+max(as.numeric(tenx_mouse.seurat.lsi_log.windows@meta.data$RNA_snn_res.0.3))
+
+print('---------')
+print('SnapATAC')
+max(as.numeric(tenx_mouse.seurat.snap.downsampled_20@meta.data$RNA_snn_res.0.3))
+max(as.numeric(tenx_mouse.seurat.snap.downsampled_50@meta.data$RNA_snn_res.0.3))
+max(as.numeric(tenx_mouse.seurat.snap@meta.data$RNA_snn_res.0.3))
+```
+For logTF LSI there are 16, 16, and 11 clusters called at this resolution with decreasing depth (8, 7, and 4 without log scaling). For SnapATAC the number of clusters called is 15, 15, and 13. Therefore, it seems like at least the last downsampling has some deterimental effect in this case for all techniques although I can't rule out the possibility that choosing slightly different site-level filtering strategies might make a difference here or that use of cluster counts is misleading in some way.
+
+It's possible that one of the two might perform better in an iterative context or other contexts in which there are less obvious differences between cells. In poking around so far, I havne't found a case where one clearly outperforms the other, but I plan to continue to compare the two on other datasets and would be very interested if someone does find some good examples.
+
+It would also be quite interesting to simulate the impact of decreased FRiP independent of complexity (downsampling at a given rate but changing the ratio of downsampling in and out of peaks/promoters).
