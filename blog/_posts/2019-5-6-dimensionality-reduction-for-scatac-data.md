@@ -5,13 +5,13 @@ tags: analysis scATAC
 ---
 There have been many different efforts to improve dimensionality reduction methods for scATAC-seq data, particularly considering that it is a relatively underexplored datatype when compared to scRNA-seq. With many different options, it can be somewhat confusing to follow the differences and pros/cons behind each method. The purpose of this post is to:
 1. Highlight the major classes of methods that exist currently
-2. Point out a very simple modification of LSI/LSA that we find works much better than the version of LSI/LSA most groups would be most likely to use
+2. Point out a very simple modification of LSI/LSA that we find works much better than the version of LSI/LSA many groups may be using
 3. Show performance of selected methods on real-world data
 4. Discuss the tradeoffs between sample-specific features and sample-agnostic features
 
 I also provide an R markdown file that demonstrates how to use some of the methods here and reproduces all the analyses (including data downloads), which I hope is useful for exploring the methods discussed in this post.
 
-<span class="downloadLink"><a class="downloadLink" href="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/analysis.html">R Markdown (HTML)</a></span>
+<span class="downloadLink"><a class="downloadLink" href="/images/posts/2019-5-6-dimensionality-reduction-for-scatac-data/analysis.html">R Markdown (HTML)</a></span>
 
 Many of the methods discussed here could, in principle, be applied to data from other single-cell epigenetic technologies, not just scATAC-seq.
 
@@ -46,7 +46,7 @@ To my knowledge, [Cusanovich, et al. (Science 2015)](https://science.sciencemag.
 
 Since LSI/LSA can be used on either windows or peaks, the specific uses in the literature mentioned above may vary with respect this choice (we have used both windows and peaks ourselves in different contexts for past publications).
 
-#### LDA/PLSI
+#### PLSI/PLSA and LDA
 Latent Dirichlet Allocation (LDA) and probabalistic LSI/LSA (PLSI/PLSA) are two other approaches borrowed from topic modeling. These techniques assume that there exist some underlying number of topics (if you were looking at documents, these might ultimately be interpretable as topics like politics, technology, etc., but in our case these might represent sets of windows/sites that share similar accessibility patterns and perhaps could be functionally related in some way) and that each observation (documents, or cells in our case) belongs to each topic with a given weight/probability. The goal is then to establish a probabalistic model that can help us find the underlying topics and assign each cell a probability of belonging to each of those topics.
 
 PLSI is a probabilitic version of LSI that can be solved using either an expectation maximization (EM) approach or a non-negative matrix factorization (NNMF) approach. Rather than doing TF-IDF followed by PCA, EM or NNMF are used to find matrices that correspond to `P(topic | document)` and `P(word | topic)` (or `P(topic | cell)` and `P(window/peak | topic)` in the context of scATAC-seq data) distributions. You would pick the number of topics in advance (much like one would pick a number of principal components). More details can be found in a number of places, including [towards data science](https://towardsdatascience.com/topic-modelling-with-plsa-728b92043f41). One of the potential benefits of PLSI/PLSA is that both matrices are very readily interpretable as probabilities, which is not quite so much the case in LSI/LSA (although the loadings from PCA can used to aid in interpretation).
@@ -73,7 +73,7 @@ I found at least one other approach described in [Lake, Chen, Sos, and Fan, et a
 
 There are likely other approaches out there that I'm not aware of or that have not been published yet. You could imagine approaches like [scVI](https://github.com/YosefLab/scVI), as described in [Lopez et al. (Nature Methods 2018)](https://www.nature.com/articles/s41592-018-0229-2) or any one of several other autoencoder-based approaches being applied to scATAC-seq data with appropriate modifications to account for the fact that the underlying data would not follow a negative binomial distribution.
 
-## Note on important modifications to LSI/LSA
+## Important details when employing LSI/LSA
 At this point, it is worth mentioning that since our group has used LSI/LSA extensively in the past, you should take my opinion here with a large grain of salt. For the comparisons below, I've done my best to try out other methods and use more than one dataset to give a relatively unbiased view.
 
 Since our last publication using scATAC-seq data ([Cusanovich and Hill, et al. [Cell 2018]](https://www.cell.com/cell/fulltext/S0092-8674(18)30855-9)), I had explored using [cisTopic](http://github.com/aertslab/cistopic) and found that it tended to work quite a bit better than our usual LSI/LSA method in many but not all cases.
@@ -104,7 +104,7 @@ tfidf = tf * idf
 ```
 
 To illustrate the effect that log scaling has, here I show the distribution of entries in the tf matrix before and after log scaling:
-<img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/tf_matrix_log.png" alt="tf_matrix_log" width="100%">
+<img src="/images/posts/2019-5-6-dimensionality-reduction-for-scatac-data/tf_matrix_log.png" alt="tf_matrix_log" width="100%">
 
 It is worth noting that the version of TF-IDF used in the 10x genomics cellranger pipeline, which is different from either discussed here (and also included for reference in the R markdown file linked above), seems to work just as well as our proposed modification (LSI logTF below) in our hands. It uses the raw binary count matrix as the TF matrix rather than dividing by the total reads per cell, which obviates the need for log scaling. It also uses a slightly different definition of the IDF term, which may or may not matter. I don't compare them here explicitly, but want to make this clear because this wouldn't be obvious unless you have examined the cellranger-atac implementation. The R markdown file provided at the top of the post contains code for both versions if you would like to try for yourself. You could also likely do a number of other things like log scaling the TF-IDF matrix itself rather than the TF matrix. I have not done exhaustive testing of every possible variant here and expect that similar results can be achieved in any of a number of ways. They main point is that there exist many valid ways to do TF-IDF and not all will perform equitably on scATAC-seq data.
 
@@ -112,7 +112,7 @@ I would also like to point out that there are some other minor modifications we 
 
 ### LSI vs. LSI logTF on data from mouse whole brain and PFC
 Log scaling the TF matrix tends to improve results markedly. Here is a comparison the original version of LSI (LSI) and the one with a log-scaled TF matrix (LSI logTF) on all whole brain and prefrontal cortex cells from Cusanovich and Hill, et al. [Cell 2018](https://www.cell.com/cell/fulltext/S0092-8674(18)30855-9) when simply imposing a lower bound on number of cells in which a site is measured as non-zero as a means of feature selection:
-<img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/mouse.lsi_vs_lsilogtf.png" alt="mouse_lsi_vs_lsilogtf" width="100%">
+<img src="/images/posts/2019-5-6-dimensionality-reduction-for-scatac-data/mouse.lsi_vs_lsilogtf.png" alt="mouse_lsi_vs_lsilogtf" width="100%">
 
 Log scaling makes a big difference here and as you'll see later, this difference can be even more pronounced on sparser datasets. I'll refer to this flavor of LSI/LSA as LSI logTF for convenience.
 
@@ -126,18 +126,18 @@ These are not perfect "metrics", but given that I am largely arguing that LSI/LS
 
 ### Comparison to cisTopic
 Reassuringly, the results look very comparable to those generated by using an LDA-based method, cisTopic (with much shorter runtimes -- minutes vs. several hours):
-<img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/mouse.lsilogtf_vs_cistopic.png" alt="mouse.lsilogtf_vs_cistopic" width="100%">
+<img src="/images/posts/2019-5-6-dimensionality-reduction-for-scatac-data/mouse.lsilogtf_vs_cistopic.png" alt="mouse.lsilogtf_vs_cistopic" width="100%">
 
 ### Comparison to Jaccard method
 I also compared to the Jaccard-based method in [SnapATAC/SnapTools](https://github.com/r3fang/SnapTools), described in [Fang, et al. (bioRxiv 2019)](https://www.biorxiv.org/content/biorxiv/early/2019/04/22/615179). Note that since SnapATAC takes a 5kb window matrix as input rather than peak matrix, I reran LSI logTF on the same window matrix used by SnapATAC to match features and cells used by both methods. This difference doesn't ultimately matter for this dataset as I'll show later in the post. I have also chosen to only use the output of SnapATAC up until the PCA stage, using our own common workflow for downstream steps to make a direct comparison.
 
-<img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/mouse.lsilogtf_vs_snapatac.png" alt="mouse_lsilogtf_vs_snapatac" width="100%">
+<img src="/images/posts/2019-5-6-dimensionality-reduction-for-scatac-data/mouse.lsilogtf_vs_snapatac.png" alt="mouse_lsilogtf_vs_snapatac" width="100%">
 
 Note that this method uses the binary peak matrix from SnapTools/SnapATAC which ultimately includes a different subset of cells due to QC filtering choices, etc. which seems to account for most of the difference between the use of peaks and windows here with LSI (more on this later). Both of these methods are pretty fast on datasets of this size in my hands.
 
 ### Comparison to k-mer method
 In part, I chose this particular subset of our published data as one of the examples for this post because [Lareau, Duarte and Chew, et al.](https://www.biorxiv.org/content/10.1101/612713v1) recently published the results of applying a 7-mer deviation approach to this same subset of our data. Here is a screenshot of Supplemental Figure 4 panel F from the paper for reference:
-<img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/seven-mer_deviation_mouse_atac.png" alt="seven-mer_deviation_mouse_atac" width="100%">
+<img src="/images/posts/2019-5-6-dimensionality-reduction-for-scatac-data/seven-mer_deviation_mouse_atac.png" alt="seven-mer_deviation_mouse_atac" width="100%">
 
 Based on the results above, and independent results from [González-Blas, Minnoye, et al. (Nature Methods 2019)](https://www.nature.com/articles/s41592-019-0367-1) and [Fang, et al. (bioRxiv 2019)](https://www.biorxiv.org/content/biorxiv/early/2019/04/22/615179) on simulated datasets, I think it is fairly well-established that commonly used approaches that use metafeatures like k-mers don't tend to perform as well as other alternatives. Therefore, I've chosen not to compare to these particular methods throughput the rest of this post.
 
@@ -147,13 +147,13 @@ To show that the above observations also hold true for another dataset (we have 
 Each section follows all the same conventions as the above in terms of input to each tool and plots.
 
 ### LSI vs. LSI logTF
-<img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/tenx_mouse.lsi_vs_lsilogtf.png" alt="tenx_mouse_lsi_vs_lsilogtf" width="100%">
+<img src="/images/posts/2019-5-6-dimensionality-reduction-for-scatac-data/tenx_mouse.lsi_vs_lsilogtf.png" alt="tenx_mouse_lsi_vs_lsilogtf" width="100%">
 
 ### Comparison to cisTopic
-<img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/tenx_mouse.lsilogtf_vs_cistopic.png" alt="tenx_mouse_lsi_vs_cistopic" width="100%">
+<img src="/images/posts/2019-5-6-dimensionality-reduction-for-scatac-data/tenx_mouse.lsilogtf_vs_cistopic.png" alt="tenx_mouse_lsi_vs_cistopic" width="100%">
 
 ### Comparison to Jaccard method
-<img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/tenx_mouse.lsilogtf_vs_snapatac.png" alt="tenx_mouse_lsilogtf_vs_snapatac" width="100%">
+<img src="/images/posts/2019-5-6-dimensionality-reduction-for-scatac-data/tenx_mouse.lsilogtf_vs_snapatac.png" alt="tenx_mouse_lsilogtf_vs_snapatac" width="100%">
 
 ## Windows vs. peaks as features
 Our lab has historically used peaks as features in most cases (although we have applied LSI to 5kb windows regularly for preliminary clustering steps in all our scATAC-seq publications). Regardless of the choice of dimensionality reduction features, peak by cell matrices (and peak calls more generally) are inevitably quite useful as many analyses are centered around peaks (differential accessibility, motif enrichments, etc.).
@@ -163,10 +163,10 @@ However, one thing that scATAC-seq currently lacks relative to scRNA-seq is a co
 Here I show that at least for the two datases mentioned above, when matching the cells used as input to the analysis, results using peaks and windows are pretty comparable. More comprehensive assessment would be required to say if either is a better choice in other contexts.
 
 ### Mouse whole brain and PFC
-<img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/mouse.peaks_vs_windows.png" alt="mouse_peaks_vs_windows" width="100%">
+<img src="/images/posts/2019-5-6-dimensionality-reduction-for-scatac-data/mouse.peaks_vs_windows.png" alt="mouse_peaks_vs_windows" width="100%">
 
 ### 10X adult mouse brain dataset
-<img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/tenx_mouse.peaks_vs_windows.png" alt="tenx_mouse_peaks_vs_windows" width="100%">
+<img src="/images/posts/2019-5-6-dimensionality-reduction-for-scatac-data/tenx_mouse.peaks_vs_windows.png" alt="tenx_mouse_peaks_vs_windows" width="100%">
 
 ## Downsampled data
 Several papers have examined the impact of decreased complexity on dimensionality reduction results. When starting with a window matrix, if we want to assess the impact of overall complexity on dimensionality reduction, we can just choose a subset of non-zero window-cell entries to zero out at random as a method of downsampling. This task is simplified by the use of windows, since peak calls themselves would be subject to change with decreased depth.
@@ -175,7 +175,7 @@ It is worth noting that this by no means captures the real world variation in da
 
 In the interest of time, I chose only to focus on LSI logTF and SnapATAC on the 10x genomics adult mouse brain dataset, but the R markdown file mentioned at the start of the post has all the code one would need to try this out on other datasets. In this case, 20% of the original depth corresponds to only 1-3K unique fragments per cell depending on how you count (quite sparse).
 
-<img src="/images/posts/2019-4-23-dimensionality-reduction-for-scatac-data/downsampling.png" alt="downsampling" width="100%">
+<img src="/images/posts/2019-5-6-dimensionality-reduction-for-scatac-data/downsampling.png" alt="downsampling" width="100%">
 
 All plots are colored by the original LSI logTF cluster assignments using windows as features. Both SnapATAC and our logTF version of LSI seem to perform quite well at reduced depth. While the plots above look very consistent, there is a slight decrease in the number of clusters called by Seurat for all approaches with downsampling using a consistent resolution parameter (although using a higher resolution paramter would probably enable similar groupings, which is great).
 
