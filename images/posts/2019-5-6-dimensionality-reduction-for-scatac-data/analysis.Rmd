@@ -15,7 +15,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r, echo=TRUE, warning=FALSE, error=FALSE, message=FALSE, fig.keep="none", results="hide"}
 options(stringsAsFactors = FALSE)
 library(Matrix)
-library(DelayedArray)
 library(Seurat)
 library(ggplot2)
 library(irlba)
@@ -104,29 +103,18 @@ downsample_matrix = function(bmat, fraction_remaining=0.5, cells_per_site_min=1,
 ########################################
 # Functions for LSI
 ########################################
-# Helper function to fall back on out of memory matrix multiplication if needed for TF * IDF
+# Helper function to do fast version of row scaling of sparse TF matrix by IDF vector.
+# Exploits the way that data is stored within sparseMatrix object. Seems to be much more memory efficient than tf * idf and faster than DelayedArray.
 # Args:
 #   tf (sparse matrix): term frequency matrix
 #   idf (vector): IDF vector
-#   block_size (int): block size for DelayedArray
 # Returns:
 #   sparse matrix: TF-IDF matrix
-safe_tfidf_multiply = function(tf, idf,  block_size=2000e6) {
-  result = tryCatch({
-    result = tf * idf
-    result
-  }, error = function(e) {
-    options(DelayedArray.block.size=block_size)
-    DelayedArray:::set_verbose_block_processing(TRUE)
-    
-    tf = DelayedArray(tf)
-    idf = as.matrix(idf)
-    
-    result = tf * idf
-    result
-  })
-  result = as(result, "sparseMatrix")
-  return(result)
+safe_tfidf_multiply = function(tf, idf) {
+   tf = t(tf)
+   tf@x <- tf@x * rep.int(idf, diff(tf@p))
+   tf = t(tf)
+   return(tf)
 }
 
 # Perform TF-IDF on binary matrix
@@ -584,7 +572,7 @@ download.file('https://krishna.gs.washington.edu/content/members/ajh24/2019_04_1
 ## Promoter definitions
 download.file('http://renlab.sdsc.edu/r3fang/share/Fang_2019/MOs_snATAC/genes/promoter.bed', 'data_downloads/promoters.mm10.bed')
 download.file('https://krishna.gs.washington.edu/content/members/ajh24/2019_04_19_atac_dim_reduction_blogpost/data_release/promoters.mm9.bed', 'data_downloads/promoters.mm9.bed')
-download.file('https://krishna.gs.washington.edu/content/members/ajh24/2019_04_19_atac_dim_reduction_blogpost/data_release/promoters.hg19.bed', 'data_downloads/promoters.hg19.bed') # not used here
+download.file('http://renlab.sdsc.edu/r3fang/share/Fang_2019/published_scATAC/atac_v1_pbmc_10k_fastqs/promoter.bed', 'data_downloads/promoters.hg19.bed')
 
 ## ENCODE blacklist regions
 download.file('http://mitra.stanford.edu/kundaje/akundaje/release/blacklists/mm10-mouse/mm10.blacklist.bed.gz', 'data_downloads/encode_blacklist.mm10.bed.gz')
