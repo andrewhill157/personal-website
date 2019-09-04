@@ -365,6 +365,10 @@ div.smallIcon {
         background-color: rgba(54, 25, 25, .25);
         margin-top: 100px;
         border-radius: 10px;
+
+        a {
+            color: #ccc;
+        }
     }
 
     @media only screen and (max-width: 700px) {
