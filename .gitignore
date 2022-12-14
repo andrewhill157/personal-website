@@ -3,3 +3,4 @@ images/social icons (unused)/
 images/.picasaoriginals/header.1.jpg
 *.docx
 _site
+.DS_Store
