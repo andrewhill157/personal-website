@@ -144,17 +144,16 @@ PROJECT TILES
 
   .project-thumbnail {
     width: 100%;
-    padding-top: 75%; // 4:3 aspect ratio
-    position: relative;
+    max-height: 300px; // Adjust this value as needed
+    display: flex;
+    justify-content: center;
+    align-items: center;
     overflow: hidden;
 
     img {
-      position: absolute;
-      top: 0;
-      left: 0;
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: auto;
+      object-fit: contain;
     }
   }
 
@@ -176,7 +175,63 @@ PROJECT TILES
       }
     }
   }
-}
+}.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .project-tile {
+    background-color: $light_background_color;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+  
+    &:hover {
+      transform: translateY(-5px);
+    }
+  
+    a {
+      color: inherit;
+      text-decoration: none;
+      display: block;
+    }
+  
+    .project-thumbnail {
+      width: 100%;
+      max-height: 300px; // Adjust this value as needed
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+  
+      img {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+      }
+    }
+  
+    .project-info {
+      padding: 1rem;
+  
+      p {
+        margin: 0 0 0.5rem;
+        font-size: 0.9rem;
+        line-height: 1.2;
+  
+        &:last-child {
+          margin-bottom: 0;
+        }
+  
+        strong {
+          font-weight: 600;
+          margin-right: 0.25rem;
+        }
+      }
+    }
+  }
 
 /*********************************************************************************
 BLOG FEED
