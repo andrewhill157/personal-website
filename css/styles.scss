@@ -121,7 +121,7 @@ PROJECT TILES
 
 .project-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1.5rem;
 }
 
@@ -139,23 +139,27 @@ PROJECT TILES
   a {
     color: inherit;
     text-decoration: none;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+    display: block;
   }
 
-  img {
+  .project-thumbnail {
     width: 100%;
-    height: 150px;
-    object-fit: cover;
+    padding-top: 75%; // 4:3 aspect ratio
+    position: relative;
+    overflow: hidden;
+
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   }
 
   .project-info {
     padding: 1rem;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
 
     p {
       margin: 0 0 0.5rem;
