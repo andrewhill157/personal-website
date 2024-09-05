@@ -40,7 +40,6 @@ p {
     -webkit-margin-after: 1em;
 
     @media only screen and (max-width: 700px) { text-align: left; }
-
 }
 
 a {
@@ -101,7 +100,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .leadText {
     margin: 0 0 15px;
-
     font-size: 20px;
     font-weight: 200;
 }
@@ -109,6 +107,71 @@ h1, h2, h3, h4, h5, h6 {
 small {
     text-align: center;
     display: block;
+}
+
+/*********************************************************************************
+PROJECT TILES
+*********************************************************************************/
+.projects {
+  h2 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.project-tile {
+  background-color: $light_background_color;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+  }
+
+  .project-info {
+    padding: 1rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    p {
+      margin: 0 0 0.5rem;
+      font-size: 0.9rem;
+      line-height: 1.2;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      strong {
+        font-weight: 600;
+        margin-right: 0.25rem;
+      }
+    }
+  }
 }
 
 /*********************************************************************************
@@ -351,214 +414,6 @@ div.smallIcon {
         width: 20px;
         background-color: $main_text_color;
     }
-}
-
-#about {
-    background-image: url(/images/headshot-trees.jpg);
-    background-repeat:no-repeat;
-    background-position: center top;
-    background-size: cover;
-    text-align: justify;
-    min-height: 650px;
-
-    .intro {
-        background-color: rgba(54, 25, 25, .25);
-        margin-top: 100px;
-        border-radius: 10px;
-
-        a {
-            color: #ccc;
-        }
-    }
-
-    @media only screen and (max-width: 700px) {
-        .span_2_of_2 {
-            width: 100%;
-        }
-        .span_1_of_2 {
-            width: 100%;
-        }
-    }
-
-    .leadText {
-        font-weight: 600;
-        padding: 20px;
-        margin: 0;
-    }
-
-    div.socialMediaLinks {
-        width: 270px;
-        height: 40px;
-        opacity: 0.65;
-        margin: 0 auto;
-    }
-
-    .socialMediaLinks img {
-        background-color:  transparent;
-    }
-
-    color: white;
-}
-
-/*********************************************************************************
-PROJECT PAGES
-*********************************************************************************/
-.background {
-    border-color: $dark_border_color;
-}
-
-div.projectThumbnailBody {
-    position: relative;
-    height: 180px;
-    overflow: hidden;
-    box-shadow: 1px 1px 1px 1px $shadow;
-
-    img {
-        position: relative;
-        overflow: hidden;
-        width: 100%;
-        background-color: white;
-    }
-
-    p {
-        color: white;
-        background-color: $dark_background_color;
-        opacity: .90;
-        padding: 10px;
-        line-height: 28px;
-        text-align: left;
-        position: absolute;
-        bottom: 0;
-        margin: 0;
-        height: 28px;
-        width: 95%;
-        font-weight: 600;
-        transition: all .15s;
-        -webkit-transition: all .15s;
-        -moz-transition: all .15s;
-
-        small {
-            opacity: 0;
-            height: 30px;
-            text-align: left;
-        }
-    }
-
-    &:hover {
-        p { height: 90px; }
-        small { opacity: 1; }
-    }
-}
-
-img.projectIcon {
-        height: 30px;
-        width: 30px;
-        display: inline;
-        background-color: $dark_background_color;
-        opacity: .90;
-}
-
-img.projectIcon:hover {
-        transform: scale(1.05);
-        -moz-transform: scale(1.05);
-        -webkit-transform: scale(1.05);
-        -o-transform: scale(1.05);
-}
-
-div.publicationThumbnailBody {
-    position: relative;
-    overflow: hidden;
-    height: 400px;
-    box-shadow: 1px 1px 1px 1px $shadow;
-
-    img {
-        position: relative;
-        overflow: hidden;
-        width: 100%;
-    }
-
-    p {
-        color: white;
-        background-color: $dark_background_color;
-        opacity: .90;
-        padding: 10px;
-        line-height: 28px;
-        text-align: left;
-        position: absolute;
-        bottom: 0;
-        margin: 0;
-        height: 28px;
-        width: 95%;
-        font-weight: 600;
-        transition: all .15s;
-        -webkit-transition: all .15s;
-        -moz-transition: all .15s;
-
-        small {
-            opacity: 0;
-            height: 30px;
-            text-align: left;
-        }
-    }
-
-    &:hover {
-        p { height: 180px; }
-        small { opacity: 1; }
-    }
-}
-
-
-
-.projectTitle {
-    font-size: 20px;
-    &:hover { cursor: pointer; }
-}
-
-.smallIcon {
-    background-color: $dark_background_color;
-}
-
-span.downloadLink {
-    background-color: $primary_highlight;
-    border: 2px solid $primary_highlight;
-    border-radius: 5px;
-    padding: 10px;
-    cursor: pointer;
-    box-shadow: 0 2px 1px $shadow;
-    margin-top: 10px;
-    margin-bottom: 10px;
-
-    a {
-        color: $light_text_color;
-        font-weight: 600;
-    }
-
-    &:hover { background-color: lighten( $primary_highlight, 5% ); }
-
-    a:hover { text-decoration: none; }
-}
-
-.projectBody {
-    border-color: $medium_border_color;
-}
-
-.expandIcon {
-    text-align: center;
-    font-weight: 400;
-    font-size: 15px;
-
-    float: left;
-    display: inline-block;
-    position: relative;
-    top: 3px;
-
-    width: 21px;
-    height: 21px;
-
-    margin-right: 3px;
-
-    background-color: $dark_background_color;
-    color: $light_text_color;
 }
 
 /*********************************************************************************
