@@ -319,6 +319,33 @@ tr:nth-child(even) {
 }
 
 /*********************************************************************************
+BLOG LAYOUT
+*********************************************************************************/
+.blog-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+  }
+  
+  @media (max-width: 768px) {
+    .blog-layout {
+      grid-template-columns: 1fr;
+      grid-template-areas: 
+        "sidebar"
+        "content";
+    }
+  
+    .blog-content {
+      grid-area: content;
+    }
+  
+    .blog-sidebar {
+      grid-area: sidebar;
+    }
+  }
+
+
+/*********************************************************************************
 SIDEBAR
 *********************************************************************************/
 .sidebar {

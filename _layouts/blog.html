@@ -1,12 +1,12 @@
 {% include header_base.html %}
 <div class="container">
-<div class="partition group post">
-	<div class="col span_2_of_3">
+	<div class="blog-layout">
+	  <main class="blog-content">
 		{{ content }}
-	</div>
-	<div class="col span_1_of_3">
+	  </main>
+	  <aside class="blog-sidebar">
 		{% include sidebar.html %}
+	  </aside>
 	</div>
-</div>
-</div>
+  </div>
 {% include footer.html %}

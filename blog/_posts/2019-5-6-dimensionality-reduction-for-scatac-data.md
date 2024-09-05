@@ -3,6 +3,7 @@ title: Dimensionality Reduction for scATAC Data
 layout: post
 tags: analysis scATAC
 ---
+
 There have been many different efforts to improve dimensionality reduction methods for scATAC-seq data, particularly considering that it is a relatively underexplored datatype when compared to scRNA-seq. With many different options, it can be somewhat confusing to follow the differences and pros/cons behind each method. The purpose of this post is to:
 1. Highlight the major classes of methods that exist currently
 2. Point out a very simple modification of LSI/LSA that we find works much better than the version of LSI/LSA many groups may be using
@@ -11,7 +12,7 @@ There have been many different efforts to improve dimensionality reduction metho
 
 I also provide an R markdown file that demonstrates how to use some of the methods here and reproduces all the analyses (including data downloads), which I hope is useful for exploring the methods discussed in this post.
 
-<span class="downloadLink"><a class="downloadLink" href="/images/posts/2019-5-6-dimensionality-reduction-for-scatac-data/analysis.html">R Markdown (HTML)</a></span>
+<a href="/images/posts/2019-5-6-dimensionality-reduction-for-scatac-data/analysis.html" class="call-to-action-button">R Markdown (HTML)</a>
 
 Many of the methods discussed here could, in principle, be applied to data from other single-cell epigenetic technologies, not just scATAC-seq.
 

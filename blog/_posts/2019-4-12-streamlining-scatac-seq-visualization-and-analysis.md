@@ -3,6 +3,7 @@ title: Streamlining scATAC-seq Visualization and Analysis
 layout: post
 tags: analysis scATAC
 ---
+
 In contrast to most single-cell RNA-seq analyses, there are many regular tasks when working with single-cell ATAC-seq (scATAC-seq) data, such as peak calling and plotting pileups, that require the BAM file (or something similar) containing some representation of the actual reads. Unlike bulk ATAC-seq data, in which your samples are static and will not change, "samples" in single-cell datasets will consist of groups of similar cells, typically arrived at via clustering. This is often an exploratory and iterative process, so your "samples" can be subject to frequent changes. You might even want to group your cells by other metadata fields entirely.
 
 Since most tools for doing things like peak calling and plotting pileups are designed for bulk samples, they typically require either 1) separate files for each sample or 2) modification of the BAM file to include modified tags/read groups so that the tool knows how to group reads. This means you end up having to duplicate or rewrite BAM files frequently.
