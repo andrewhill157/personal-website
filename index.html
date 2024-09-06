@@ -6,14 +6,18 @@ layout: front_page
 <div class="container">
   <div class="section">
     <div class="about-me">
-      <p class="leadText cv-button-container">
-        I am a passionate technologist and scientist with training in bioengineering, computational biology, and molecular biology. Through my roles in academia and the biotech industry, I've led highly interdisciplinary projects within fields such as high-throughput single-cell assay development, epigenetic editing in the context of gene and cell therapy, and antibody discovery and engineering.
-      </p>
-      <p class="leadText cv-button-container">
-        Please reach out if you'd like to get in touch!
-      </p>
-      {% include socialMediaLinks.html %}
-      </p>
+      <div class="about-me-content">
+        <img src="/images/headshot.jpg" alt="Andrew John Hill" class="headshot">
+        <div class="about-me-text">
+          <p class="leadText">
+            I am a passionate technologist and scientist with training in bioengineering, computational biology, and molecular biology. Through my roles in academia and the biotech industry, I've led highly interdisciplinary projects within fields such as high-throughput single-cell assay development, epigenetic editing in the context of gene and cell therapy, and antibody discovery and engineering.
+          </p>
+          <p class="leadText">
+            Please reach out if you'd like to get in touch!
+          </p>
+          {% include socialMediaLinks.html %}
+        </div>
+      </div>
     </div>
 </div>
 
@@ -31,9 +35,12 @@ layout: front_page
           </div>
           <div class="timeline-marker"></div>
           <div class="timeline-content">
-            <h3>Scientist (Computational Biology)</h3>
-            <p class="timeline-workplace">Infinimmune</p>
-            <p class="timeline-description">Part of a small team developing a novel antibody discovery and engineering platform.</p>
+            <img src="/images/company_thumbnails/infinimmune.jpeg" alt="Infinimmune" class="timeline-company-logo">
+            <div class="timeline-text-content">
+              <h3>Scientist (Computational Biology)</h3>
+              <p class="timeline-workplace">Infinimmune</p>
+              <p class="timeline-description">Part of a small team developing a novel antibody discovery and engineering platform.</p>
+            </div>
           </div>
         </li>
         <li class="timeline-item">
@@ -42,9 +49,12 @@ layout: front_page
           </div>
           <div class="timeline-marker"></div>
           <div class="timeline-content">
-            <h3>Senior Computational Biologist</h3>
-            <p class="timeline-workplace">Tune Therapeutics</p>
-            <p class="timeline-description">Co-led the implmentation of high-throughout screening approaches for target discovery and engineering improved epigenetic editing systems.</p>
+            <img src="/images/company_thumbnails/tunetx.jpeg" alt="Tune Therapeutics" class="timeline-company-logo">
+            <div class="timeline-text-content">
+              <h3>Senior Computational Biologist</h3>
+              <p class="timeline-workplace">Tune Therapeutics</p>
+              <p class="timeline-description">Co-led the implmentation of high-throughout screening approaches for target discovery and engineering improved epigenetic editing systems.</p>
+            </div>
           </div>
         </li>
         <li class="timeline-item">
@@ -53,9 +63,12 @@ layout: front_page
           </div>
           <div class="timeline-marker"></div>
           <div class="timeline-content">
-            <h3>Senior Computational Biologist</h3>
-            <p class="timeline-workplace">10x Genomics</p>
-            <p class="timeline-description">Core contributor to Gene Expression Flex (formerly Fixed RNA Profiling), Targeted Gene Expression, and Chromium X. Probe design for all probe-based assays including Gene Expression Flex, Visium for FFPE, Visium HD, and Xenium In-Situ.</p>
+            <img src="/images/company_thumbnails/10x_genomics.png" alt="10x Genomics" class="timeline-company-logo">
+            <div class="timeline-text-content">
+              <h3>Senior Computational Biologist</h3>
+              <p class="timeline-workplace">10x Genomics</p>
+              <p class="timeline-description">Core contributor to Gene Expression Flex (formerly Fixed RNA Profiling), Targeted Gene Expression, and Chromium X. Probe design for all probe-based assays including Gene Expression Flex, Visium for FFPE, Visium HD, and Xenium In-Situ.</p>
+            </div>
           </div>
         </li>
         <li class="timeline-item education">
@@ -64,8 +77,11 @@ layout: front_page
           </div>
           <div class="timeline-marker"></div>
           <div class="timeline-content">
-            <h3>Ph.D. in Genome Sciences</h3>
-            <p class="timeline-workplace">University of Washington</p>
+            <img src="/images/company_thumbnails/uw.png" alt="University of Washington" class="timeline-company-logo">
+            <div class="timeline-text-content">
+              <h3>Ph.D. in Genome Sciences</h3>
+              <p class="timeline-workplace">University of Washington</p>
+            </div>
           </div>
         </li>
         <li class="timeline-item">
@@ -74,9 +90,12 @@ layout: front_page
           </div>
           <div class="timeline-marker"></div>
           <div class="timeline-content">
-            <h3>Computational Biology Intern</h3>
-            <p class="timeline-workplace">10x Genomics</p>
-            <p class="timeline-description">Contributed to software and assay development for initial Immune Profiling product. Extensive development of internal interactive visualizations that inspired Loupe for VDJ.</p>
+            <img src="/images/company_thumbnails/10x_genomics.png" alt="10x Genomics" class="timeline-company-logo">
+            <div class="timeline-text-content">
+              <h3>Computational Biology Intern</h3>
+              <p class="timeline-workplace">10x Genomics</p>
+              <p class="timeline-description">Contributed to software and assay development for initial Immune Profiling product. Extensive development of internal interactive visualizations that inspired Loupe for VDJ.</p>
+            </div>
           </div>
         </li>
         <li class="timeline-item education">
@@ -85,9 +104,12 @@ layout: front_page
           </div>
           <div class="timeline-marker"></div>
           <div class="timeline-content">
-            <h3>Graduate Student and NSF GRFP Fellow</h3>
-            <p class="timeline-workplace">Shendure Lab, University of Washington</p>
-            <p class="timeline-description">Research focused on single-cell multiomics assays and high dimensional readouts for genetic screens.</p>
+            <img src="/images/company_thumbnails/uw.png" alt="University of Washington" class="timeline-company-logo">
+            <div class="timeline-text-content">
+              <h3>Graduate Student and NSF GRFP Fellow</h3>
+              <p class="timeline-workplace">Shendure Lab, University of Washington</p>
+              <p class="timeline-description">Research focused on single-cell multiomics assays and high dimensional readouts for genetic screens.</p>
+            </div>
           </div>
         </li>
         <li class="timeline-item">
@@ -96,9 +118,12 @@ layout: front_page
           </div>
           <div class="timeline-marker"></div>
           <div class="timeline-content">
-            <h3>Research Assistant</h3>
-            <p class="timeline-workplace">MacArthur Lab, Massachusetts General Hospital</p>
-            <p class="timeline-description">Introductory projects in genomics and contributions to the ExAC project.</p>
+            <img src="/images/company_thumbnails/mgh.jpg" alt="Massachusetts General Hospital" class="timeline-company-logo">
+            <div class="timeline-text-content">
+              <h3>Research Assistant</h3>
+              <p class="timeline-workplace">MacArthur Lab, Massachusetts General Hospital</p>
+              <p class="timeline-description">Introductory projects in genomics and contributions to the ExAC project.</p>
+            </div>
           </div>
         </li>
         <li class="timeline-item education">
@@ -107,8 +132,11 @@ layout: front_page
           </div>
           <div class="timeline-marker"></div>
           <div class="timeline-content">
-            <h3>B.S. in Bioengineering (UW Honors Department)</h3>
-            <p class="timeline-workplace">University of Washington</p>
+            <img src="/images/company_thumbnails/uw.png" alt="University of Washington" class="timeline-company-logo">
+            <div class="timeline-text-content">
+              <h3>B.S. in Bioengineering (UW Honors Department)</h3>
+              <p class="timeline-workplace">University of Washington</p>
+            </div>
           </div>
         </li>
         <li class="timeline-item education">
@@ -117,9 +145,12 @@ layout: front_page
           </div>
           <div class="timeline-marker"></div>
           <div class="timeline-content">
-            <h3>Undergraduate Researcher</h3>
-            <p class="timeline-workplace">Biorobotics Lab, University of Washington</p>
-            <p class="timeline-description">Built robotic devices to enable charecterization of soft tissue mechanics.</p>
+            <img src="/images/company_thumbnails/uw.png" alt="University of Washington" class="timeline-company-logo">
+            <div class="timeline-text-content">
+              <h3>Undergraduate Researcher</h3>
+              <p class="timeline-workplace">Biorobotics Lab, University of Washington</p>
+              <p class="timeline-description">Built robotic devices to enable charecterization of soft tissue mechanics.</p>
+            </div>
           </div>
         </li>
       </ul>
